@@ -1,0 +1,20 @@
+logo{
+	width: 2350px; height: 75px;
+	background: url("logo.png") top right;
+	margin: 0 0 0 -2000px;
+
+}
+
+p{font-family: Arial; font-size: 10pt; font-weight: bold; color: black;}
+
+body{background-color: #white; font-family: Arial; font-size: 9pt;} 
+
+
+.cell_attack_success 
+{background-color: #D3D3D3; font-size: 9pt; font-weight: bold; color:green}
+
+.cell_attack_failed
+{background-color:ivory3; font-size: 9pt; color:red;}
+
+    
+

