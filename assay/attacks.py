@@ -29,15 +29,12 @@ import webbrowser
 import funcs
 import vars
 import wafw00f
-import logging
 import itertools
 import urllib
 import multiprocessing
+from HTMLGenerator import HTMLGenerator
 from httplib import BadStatusLine
 from urllib2 import URLError
-from libs import HTML
-from libs.BeautifulSoup import BeautifulSoup as bs
-from libs import graphs
 
 """
     DVWAAttacks class
@@ -45,14 +42,6 @@ from libs import graphs
     functions of this class
 """
 class DVWAAttacks:
-    HTML_OPEN = "<html>"
-    HTML_CLOSE = "</html>"
-    HTML_BODY_OPEN = "<body>"
-    HTML_BODY_CLOSE = "</body>"
-    HTML_HEAD_OPEN = "<head>"
-    HTML_HEAD_CLOSE = "</head>"
-    HTML_TITLE_OPEN = "<title>"
-    HTML_TITLE_CLOSE = "</title>"
     
     """
         Constructor
@@ -67,39 +56,7 @@ class DVWAAttacks:
         self.wafDetected = None
         self.bruteArr = []
         self.prefix = ""
-        
-        self.text1 = "Scan Results for "
-        self.html = ""
-        self.html += self.HTML_OPEN
-        self.html += self.HTML_HEAD_OPEN
-        self.html += self.HTML_TITLE_OPEN
-        self.html += self.HTML_TITLE_CLOSE
-        self.html += "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/bayshore_style.css\" />"
-        self.html += self.HTML_HEAD_CLOSE
-        self.html += self.HTML_BODY_OPEN
-        self.html += "<h1 class=\"logo\"><a href='#'><img src='logo.png' alt='Image' /></a></h1>"
-        self.html += "<p>%s%s</p>" % (self.text1, targeturl)
-        self.t = HTML.Table(header_row=['Status', 'Category', 'Attack Vector', 'Target'],
-                            attribs={'class':'formtable'})
-    # EOF
-    
-    def writeHtmlTableCell(self, success=False, attackType="", target="", vect=""):
-        if success:
-            _category = HTML.TableCell(attackType,
-                                       attribs={"style":"word-break:break-all",
-                                                'class':'cell_attack_success'})
-            _target = HTML.TableCell(target, attribs={'class':'cell_attack_success'})
-            _status = HTML.TableCell("Success", attribs={'class':'cell_attack_success'})
-            _vector = HTML.TableCell(vect, attribs={'class':'cell_attack_success'})
-        else:
-            _category = HTML.TableCell(attackType,
-                                       attribs={"style":"word-break:break-all",
-                                                'class':'cell_attack_failed'})
-            _target = HTML.TableCell(target, attribs={'class':'cell_attack_failed'})
-            _status = HTML.TableCell("Failed", attribs={'class':'cell_attack_failed'})
-            _vector = HTML.TableCell(vect, attribs={'class':'cell_attack_failed'})
-            
-        self.t.rows.append([_status, _category, _vector, _target])
+        self.htmlgen = HTMLGenerator(targeturl=targeturl)
         
     def sanitizeVector(self, vect="", xss=False):
         pvect = ""
@@ -115,53 +72,7 @@ class DVWAAttacks:
                 pvect = "non-printable"
             
         return pvect
-    
-    def generateHtmlStats(self):
-        sts = "<p>Stats</p>"
-        t = HTML.Table(header_row=['Type', 'Sent', 'Successful', 'Failed'],
-                       attribs={'class':'formtable'})
-        for key, value in sorted(vars.typecount.iteritems(), key=lambda (k,v): (v,k)):
-            if value[0] > 0:
-                if value[1] < 1:
-                    _category = HTML.TableCell(vars.typedesc[key][0],
-                                               attribs={"style":"word-break:break-all",
-                                                        'class':'cell_attack_failed'})
-                    _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_failed'})
-                    _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_failed'})
-                    _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_failed'})
-                else:
-                    _category = HTML.TableCell(vars.typedesc[key][0],
-                                               attribs={"style":"word-break:break-all",
-                                                        'class':'cell_attack_success'})
-                    _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_success'})
-                    _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_success'})
-                    _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_success'})
-                
-                t.rows.append([_category, _sent, _success, _fail])
-        return sts + str(t)
-        
-    def getJsCode(self):
-        
-        thestr = ""
-        cnt = 0
-        for key, value in sorted(vars.typecount.iteritems(), key=lambda (k,v): (v,k)):
-            graph = graphs.BarGraph('hBar')
-            sarr = []
-            thestr += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tr><td><p>%s - Sent: %s</p></td></tr><tr><td>" % (vars.typedesc[key][0], value[0])
-            # vars.typedesc[key][0]
-            sarr.append(vars.typedesc[key][0])
-            #thestr += "var s%s = [%s, %s, %s];" % (cnt, value[0], value[1], value[2])
-            graph.values.append((value[1], value[2]))
-        
-            graph.labels = sarr
-            if cnt == 0:
-                graph.legend = ['Succeeded', 'Failed']
-            #graph.labelSpace = 10
-            thestr += graph.create()
-            thestr += "</td></tr></table>"
-            cnt += 1
-        return thestr
-    
+
     def setHTMLFilePrefix(self, val=0):
         if val == 0:
             self.prefix = "pre_"
@@ -169,25 +80,9 @@ class DVWAAttacks:
             self.prefix = "post_"
     
     def saveHTML(self):
-        fhandle = vars.getHtmlPath() + self.prefix + vars.getHtmlFileName() + funcs.getTimeStamp() + vars.getHtmlFileExt()
-        f = open(fhandle, 'w')
-        
-        self.html += str(self.t)        
-        self.html += self.generateHtmlStats()
-        
-        self.html += "<div><pre>"
-        self.html += self.getJsCode()
-        self.html += "</pre></div>"
-        
-        self.html += self.HTML_BODY_CLOSE
-        self.html += self.HTML_CLOSE
-        
-        # make it purty :-)
-        soup = bs(self.html.encode('utf-8'), indentWidth='    ')
-        prettyHTML = soup.prettify()
-        f.write(prettyHTML)
-        f.close()
-        funcs.attackOutPut(funcs.stepOne, "info", "HTML was written to file: %s" % fhandle)
+        fh = vars.getHtmlPath() + self.prefix + vars.getHtmlFileName() + funcs.getTimeStamp() + vars.getHtmlFileExt()
+        self.htmlgen.saveHTML(fhandle=fh,keyval=vars.typecount)
+        funcs.attackOutPut(funcs.stepOne, "info", "HTML was written to file: %s" % fh)
     
     """
         for some of the browser displayed attacks to
@@ -204,7 +99,7 @@ class DVWAAttacks:
         using wafw00f's API
     """
     def detectWAF(self):
-        logging.basicConfig(level=40)
+        #logging.basicConfig(level=40)
         wf = wafw00f.wafwoof_api()
 
         self.wafDetected = wf.vendordetect(self.url)
@@ -236,14 +131,6 @@ class DVWAAttacks:
             wbs = m.hexdigest()
         except:
             pass
-        '''
-        vars.typecount['fi'][0] += 1
-        if wbs:
-            print "\n\n>>>>>>>>Baselining ... %s\n\n" % wbs
-            vars.typecount['fi'][1] += 1
-        else:
-            vars.typecount['fi'][2] += 1
-        '''
         
         try:
             # do a sqli
@@ -253,14 +140,6 @@ class DVWAAttacks:
             wbsql = msql.hexdigest()
         except:
             pass
-        '''
-        vars.typecount['sqli'][0] += 1
-        if wbsql:
-            print "\n\n>>>>>>>>Baselining ... %s\n\n" % wbsql
-            vars.typecount['sqli'][1] += 1
-        else:
-            vars.typecount['sqli'][2] += 1
-        '''
     
         try:
             # do an xss
@@ -270,14 +149,6 @@ class DVWAAttacks:
             wbsxss = mxss.hexdigest()
         except:
             pass
-        '''
-        vars.typecount['xss_r'][0] += 1
-        if wbsxss:
-            print "\n\n>>>>>>>>Baselining ... %s\n\n" % wbsxss
-            vars.typecount['xss_r'][1] += 1
-        else:
-            vars.typecount['xss_r'][2] += 1
-        '''
 
         """
             so if this var is not None then we have detected that a
@@ -327,15 +198,11 @@ class DVWAAttacks:
         for p in psw:
             resp = funcs.formSubmit(fp, targetpage, 0, {cru:user, crp:p}, sleep=False)
             vars.typecount['brute'][0] += 1
-            #if not brutereg.search(resp):
-            #print resp
+
             if "incorrect" not in resp:
-                #return "%s : %s" % (u,p)
-                #print "\nFOUND: " + user + ":" + p + "\n"
                 funcs.attackOutPut(funcs.stepFive, "discovered", "Found - user: %s, psw: %s" % (user, p))
                 self.bruteArr.append(user + ":" + p)
                 return
-        #return None
 
     """
         attackbrute covers areas of:
@@ -349,11 +216,11 @@ class DVWAAttacks:
         give away their purpose)
     """
     def attackbrute(self, fp, targetpage):
-        # this represents a failure of the brute force data
-        # this was for 1.0.6
-        #brutefailedstr = "<pre><br>Username and/or password incorrect.</pre>"
-        
-        
+        '''
+            this represents a failure of the brute force data
+            this was for 1.0.6
+            brutefailedstr = "<pre><br>Username and/or password incorrect.</pre>"
+        '''
         brutefailedstr = "Failed"
         bruteFailReg = re.compile(brutefailedstr,re.I+re.MULTILINE)
         discattacks = []
@@ -510,15 +377,15 @@ class DVWAAttacks:
                         if p not in discattacks:
                             discattacks.append(p)
                             vars.typecount['exec'][1] += 1
-                            self.writeHtmlTableCell(success=True, attackType="Exec",
+                            self.htmlgen.writeHtmlTableCell(success=True, attackType="Exec",
                                                     target=targetpage, vect=pvect)
                     else:
                         vars.typecount['exec'][2] += 1
-                        self.writeHtmlTableCell(success=False, attackType="Exec",
+                        self.htmlgen.writeHtmlTableCell(success=False, attackType="Exec",
                                                 target=targetpage, vect=pvect)
                 else:
                     vars.typecount['exec'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="Exec",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Exec",
                                             target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
@@ -602,15 +469,15 @@ class DVWAAttacks:
                     if baseline != newhash and not self.isWAFBaseline(newhash):
                         discattacks.append(v)
                         vars.typecount['fi'][1] += 1
-                        self.writeHtmlTableCell(success=True, attackType="File Inclusion",
+                        self.htmlgen.writeHtmlTableCell(success=True, attackType="File Inclusion",
                                                 target=targetpage, vect=pvect)
                     else:
                         vars.typecount['fi'][2] += 1
-                        self.writeHtmlTableCell(success=False, attackType="File Inclusion",
+                        self.htmlgen.writeHtmlTableCell(success=False, attackType="File Inclusion",
                                                 target=targetpage, vect=pvect)
                 except Exception:
                     vars.typecount['fi'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="File Inclusion",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="File Inclusion",
                                             target=targetpage, vect=pvect)
                     pass
 
@@ -653,15 +520,15 @@ class DVWAAttacks:
                         discattacks.append(p)
                         #print "\n\n**********SQLi: %s\n\n" % p
                         vars.typecount['sqli'][1] += 1
-                        self.writeHtmlTableCell(success=True, attackType="SQLi",
+                        self.htmlgen.writeHtmlTableCell(success=True, attackType="SQLi",
                                                 target=targetpage, vect=pvect)
                     else:
                         vars.typecount['sqli'][2] += 1
-                        self.writeHtmlTableCell(success=False, attackType="SQLi",
+                        self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
                                                 target=targetpage, vect=pvect)
                 else:
                     vars.typecount['sqli'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
                                             target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
@@ -717,16 +584,16 @@ class DVWAAttacks:
                             version.append(r)
                             #print "\n\n**********SQLi Blind: %s\n\n" % r
                             vars.typecount['sqli_blind'][1] += 1
-                            self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                            self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                                     target=targetpage, vect=injection)
                         else:
                             vars.typecount['sqli_blind'][2] += 1
-                            self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                            self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                                     target=targetpage, vect=injection)
                     cnt += 1
             else:
                 vars.typecount['sqli_blind'][2] += 1
-                self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                         target=targetpage, vect=injection)
 
         if len(version) > 0:
@@ -760,12 +627,12 @@ class DVWAAttacks:
                     vars.successfulVectors += 1
                     #print "\n\n**********SQLi - hit on length calculation %s\n\n" % str(nlength)
                     vars.typecount['sqli_blind'][1] += 1
-                    self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
                     raise StopIteration()
                 else:
                     vars.typecount['sqli_blind'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
             # size not found
             funcs.attackOutPut(funcs.stepFour, "nothingfound", "DB name length NOT discovered")
@@ -794,11 +661,11 @@ class DVWAAttacks:
                         pool.append(chr(letter))
                         #print "\n\n**********SQLi - pool of chars: %s\n\n" % chr(letter)
                         vars.typecount['sqli_blind'][1] += 1
-                        self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                        self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                                 target=targetpage, vect=injection)
                 else:
                     vars.typecount['sqli_blind'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
                 
                 if len(pool) == nlength:
@@ -845,11 +712,11 @@ class DVWAAttacks:
                 cnt += 1
             #print "\n\n**********SQLi - enum: %s\n\n" % r
             vars.typecount['sqli_blind'][1] += 1
-            self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+            self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                     target=targetpage, vect=injection)
         else:
             vars.typecount['sqli_blind'][2] += 1
-            self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+            self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                     target=targetpage, vect=injection)
 
         if len(tableresults) > 0:
@@ -892,11 +759,11 @@ class DVWAAttacks:
                 cnt += 1
             #print "\n\n**********SQLi - enum psw: %s\n\n" % r
             vars.typecount['sqli_blind'][1] += 1
-            self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+            self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                     target=targetpage, vect=injection)
         else:
             vars.typecount['sqli_blind'][2] += 1
-            self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+            self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                     target=targetpage, vect=injection)
 
         if len(passhashes) > 0:
@@ -933,11 +800,11 @@ class DVWAAttacks:
                 tablename.append(table)
                 #print "\n\n**********SQLi - enum table: %s\n\n" % table
                 vars.typecount['sqli_blind'][1] += 1
-                self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                         target=targetpage, vect=injection)
             else:
                 vars.typecount['sqli_blind'][2] += 1
-                self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                         target=targetpage, vect=injection)
 
         if len(tablename) > 0:
@@ -979,11 +846,11 @@ class DVWAAttacks:
                     vars.successfulVectors += 1
                     #print "\n\n**********SQLi - enum columns: %s %s\n\n" % (i,c)
                     vars.typecount['sqli_blind'][1] += 1
-                    self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
                 else:
                     vars.typecount['sqli_blind'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
 
             if columncnt < 1:
@@ -1018,11 +885,11 @@ class DVWAAttacks:
                 fieldnames.append(name)
                 #print "\n\n**********SQLi - field name: %s\n\n" % name
                 vars.typecount['sqli_blind'][1] += 1
-                self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                         target=targetpage, vect=injection)
             else:
                 vars.typecount['sqli_blind'][2] += 1
-                self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                         target=targetpage, vect=injection)
                 
         if len(fieldnames) > 0:
@@ -1063,11 +930,11 @@ class DVWAAttacks:
                         cnt += 1
                     #print "\n\n**********SQLi - enum usernames: %s\n\n" % f + " " + r
                     vars.typecount['sqli_blind'][1] += 1
-                    self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
                 else:
                     vars.typecount['sqli_blind'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
 
         if len(usernames) > 0:
@@ -1130,11 +997,11 @@ class DVWAAttacks:
                         #cnt += 1
                     #print "\n\n**********SQLi - psw hashes: %s\n\n" % r
                     vars.typecount['sqli_blind'][1] += 1
-                    self.writeHtmlTableCell(success=True, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
                 else:
                     vars.typecount['sqli_blind'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="Blind SQLi",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
 
         if len(userhashes) > 0:
@@ -1247,11 +1114,11 @@ class DVWAAttacks:
                     discattacks.append(p)
                     #print "\n\n**********XSS: %s\n\n" % p
                     vars.typecount['xss_r'][1] += 1
-                    self.writeHtmlTableCell(success=True, attackType="XSS",
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
                                             target=targetpage, vect=pvect)
                 else:
                     vars.typecount['xss_r'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="XSS",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
                                             target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
@@ -1285,11 +1152,11 @@ class DVWAAttacks:
                     discattacks.append(p)
                     #print "\n\n**********XSS: %s\n\n" % p
                     vars.typecount['xss_s'][1] += 1
-                    self.writeHtmlTableCell(success=True, attackType="XSS",
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
                                             target=targetpage, vect=pvect)
                 else:
                     vars.typecount['xss_s'][2] += 1
-                    self.writeHtmlTableCell(success=False, attackType="XSS",
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
                                             target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
@@ -1330,5 +1197,3 @@ class DVWAAttacks:
         fn = getattr(self, "attack"+fname)
         return fn(*args, **kw)
     # EOF
-
-# http://qa.dev.ogilvy.com/dvwa/vulnerabilities/redir/?token=aHR0cDovL3NlYy5uZXVyb2Z1enotc29mdHdhcmUuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA=

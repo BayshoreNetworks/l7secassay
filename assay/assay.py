@@ -10,7 +10,8 @@
     The DVWA version used when this prog was first written: 1.0.6
     http://www.dvwa.co.uk/download.php
 
-    OWASP Top 10 areas covered by this prog:
+    OWASP Top 10 areas covered by this prog (obviously these 
+    categories change every year ...):
         A1: Injection
         A2: Cross-Site Scripting (XSS)
         A3: Broken Authentication and Session Management
@@ -72,7 +73,6 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     if funcs.checkArgs(args.secure):
-        #vars.seclevel = int(args.secure)
         secval=int(args.secure)
     else:
         print "\nInvalid sec level\n"
@@ -100,6 +100,7 @@ if __name__=='__main__':
     attacks = attacks.DVWAAttacks(url, apppath)
     # establish a baseline if its possible
     attacks.setRedirBaseline(fp=fp, url=url)
+    # set the HTML file prefix
     attacks.setHTMLFilePrefix(val=secval)
     """
         kick off an initial browser instance
@@ -119,12 +120,9 @@ if __name__=='__main__':
                 chronology of attack events
             """
             if vars.typedesc[func][3] == i:
-                #print typedesc[d]
-                #print d
                 # describe the step in stdout output
                 funcs.attackOutPut(funcs.stepTwo, "step", "Processing - %s%s ..." % (vars.typedesc[func][0], vars.typedesc[func][1]))
                 targeturl = url + apppath + targetpath + func + slash
-                #print targeturl
                 res = attacks.call(func, fp, targeturl)
 
                 # a list is returned when attack vectors
@@ -133,7 +131,9 @@ if __name__=='__main__':
                     vars.successfulVectors += len(res)
                     successfulattacks[func] = res
     ##################################################################
-    # output of results
+    '''
+        output of results to terminal
+    '''
     print
     wafdetect = attacks.detectWAF()
     if wafdetect:
