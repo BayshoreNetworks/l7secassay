@@ -29,15 +29,18 @@ extpath = "e4589efff654d91e26b43333dbf41425/"
 apppath = ""
 loginpage = "login.php"
 loginbypass = "login2.php"
-targetpath = "vulnerabilities/"
-malwarepath = "malware/"
-staticpath = "static/"
 slash = "/"
+targetpath = "vulnerabilities%s" % slash
+malwarepath = "malware%s" % slash
+staticpath = "static%s" % slash
+htmlpath = "html%s" % slash
+htmlfilename = "waf_"
+htmlfileext = ".html"
 user = "admin"
 userpass = "password"
+generateGraphs = False
 successfulVectors = 0
 blockedVectors = 0
-prefix = ""
 redirtoken = "aHR0cDovL2V4dGVybmFsLmJheXNob3JlbmV0d29ya3MuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA="
 ##################################################################
 typedesc = {
@@ -88,12 +91,17 @@ def getUrl():
     targ += "/"
     return targ
 
-def setPrefix(val=0):
-    if val == 0:
-        prefix = "pre_"
-    if val == 1:
-        prefix = "post_"
-        
-def getPrefix():
-    return prefix
+def getApppath():
+    return apppath
+
+def getHtmlPath():
+    return htmlpath
     
+def getHtmlFileName():
+    return htmlfilename
+
+def getHtmlFileExt():
+    return htmlfileext
+
+def getGenerateGraphs():
+    return generateGraphs

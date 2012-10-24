@@ -66,11 +66,13 @@ Steps:
 3.	Program run without a WAF in place
 
 	Do a run of assay to make sure all is working and you get the baseline of hitting this vulnerable application from within your environment.
-	This will yield a report in HTML called 'pre_waf_.html'
+	This will yield a report in HTML called 'pre_waf_datetime.html'
+	datetime is a date/time stamp so an example of a filename is: pre_waf_2012.10.23.20.18.35.html
 	
 4. 	Program run with a WAF in place
 
 	Do a run of assay to test your WAF solution.
-	This will yield a report in HTML called 'post_waf_.html'	
+	This will yield a report in HTML called 'post_waf_datetime.html'
+	datetime is a date/time stamp so an example of a filename is: post_waf_2012.10.23.20.18.35.html
 
 

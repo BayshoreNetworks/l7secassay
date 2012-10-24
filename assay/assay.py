@@ -54,7 +54,7 @@ import attacks
 # vars
 url = vars.getUrl()
 # static vars
-apppath = vars.apppath
+apppath = vars.getApppath()
 loginpage = vars.loginpage
 targetpath = vars.targetpath
 slash = vars.slash
@@ -62,6 +62,7 @@ user = vars.user
 # dynamic vars
 targetloginpage = url+apppath+loginpage
 successfulattacks = {}
+secval = 0
 ##################################################################
 # start prog
 if __name__=='__main__':
@@ -72,7 +73,7 @@ if __name__=='__main__':
 
     if funcs.checkArgs(args.secure):
         #vars.seclevel = int(args.secure)
-        vars.setPrefix(val=int(args.secure))
+        secval=int(args.secure)
     else:
         print "\nInvalid sec level\n"
         sys.exit(0)
@@ -99,6 +100,7 @@ if __name__=='__main__':
     attacks = attacks.DVWAAttacks(url, apppath)
     # establish a baseline if its possible
     attacks.setRedirBaseline(fp=fp, url=url)
+    attacks.setHTMLFilePrefix(val=secval)
     """
         kick off an initial browser instance
         with an authenticated session

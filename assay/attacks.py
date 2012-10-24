@@ -66,6 +66,7 @@ class DVWAAttacks:
         self.wafbaseline = None
         self.wafDetected = None
         self.bruteArr = []
+        self.prefix = ""
         
         self.text1 = "Scan Results for "
         self.html = ""
@@ -161,8 +162,15 @@ class DVWAAttacks:
             cnt += 1
         return thestr
     
+    def setHTMLFilePrefix(self, val=0):
+        if val == 0:
+            self.prefix = "pre_"
+        if val == 1:
+            self.prefix = "post_"
+    
     def saveHTML(self):
-        f = open("html/output.html", 'w')
+        fhandle = vars.getHtmlPath() + self.prefix + vars.getHtmlFileName() + funcs.getTimeStamp() + vars.getHtmlFileExt()
+        f = open(fhandle, 'w')
         
         self.html += str(self.t)        
         self.html += self.generateHtmlStats()
@@ -179,6 +187,7 @@ class DVWAAttacks:
         prettyHTML = soup.prettify()
         f.write(prettyHTML)
         f.close()
+        funcs.attackOutPut(funcs.stepOne, "info", "HTML was written to file: %s" % fhandle)
     
     """
         for some of the browser displayed attacks to
