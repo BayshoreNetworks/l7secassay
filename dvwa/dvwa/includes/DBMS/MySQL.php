@@ -12,13 +12,13 @@ if( !@mysql_connect( $_DVWA[ 'db_server' ], $_DVWA[ 'db_user' ], $_DVWA[ 'db_pas
 }
 
 // Create database
-$drop_db = "DROP DATABASE IF EXISTS dvwa;";
+$drop_db = "DROP DATABASE IF EXISTS " . $_DVWA[ 'db_database' ] . ";";
 if( !@mysql_query ( $drop_db ) ) {
 	dvwaMessagePush( "Could not drop existing database<br />SQL: ".mysql_error() );
 	dvwaPageReload();
 }
 
-$create_db = "CREATE DATABASE dvwa;";
+$create_db = "CREATE DATABASE " . $_DVWA[ 'db_database' ] . ";";
 
 if( !@mysql_query ( $create_db ) ) {
 	dvwaMessagePush( "Could not create database<br />SQL: ".mysql_error() );

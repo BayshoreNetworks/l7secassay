@@ -13,14 +13,14 @@ if ( !@pg_connect("host=".$_DVWA[ 'db_server' ]." port=".$_DVWA[ 'db_port' ]." u
 }
 
 // Create database
-$drop_db = "DROP DATABASE IF EXISTS dvwa;";
+$drop_db = "DROP DATABASE IF EXISTS ".$_DVWA[ 'db_database' ].";";
 
 if( !@pg_query($drop_db) ) {
 	dvwaMessagePush( "Could not drop existing database<br />SQL: " . pg_last_error() );
 	dvwaPageReload();
 }
 
-$create_db = "CREATE DATABASE dvwa;";
+$create_db = "CREATE DATABASE ".$_DVWA[ 'db_database' ].";";
 
 if( !@pg_query ( $create_db ) ) {
 	dvwaMessagePush( "Could not create database<br />SQL: " . pg_last_error() );

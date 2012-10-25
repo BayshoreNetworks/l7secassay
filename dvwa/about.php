@@ -16,15 +16,16 @@ $page[ 'body' ] .= "
 	<p>
 	Version ".dvwaVersionGet()." (Release date: ".dvwaReleaseDateGet().")
 	<br /><br />
-	DVWA is a RandomStorm OpenSource project. All material is copyright 2008/2009/2010 RandomStorm & Ryan Dewhurst.
+	DVWA is a RandomStorm OpenSource project. All material is copyright 2008-2011 RandomStorm & Ryan Dewhurst.
 	</p>
 
 	<h2>Links</h2>
 
 	<ul>
-		<li>Web site: ".dvwaExternalLinkUrlGet( 'http://www.dvwa.co.uk/' )."</li>
-		<li>Forum: ".dvwaExternalLinkUrlGet( 'http://www.dvwa.co.uk/forum' )."</li>
-		<li>SVN: ".dvwaExternalLinkUrlGet( 'http://dvwa.svn.sourceforge.net/svnroot/dvwa' )."</li>
+		<li>Homepage: ".dvwaExternalLinkUrlGet( 'http://www.dvwa.co.uk/' )."</li>
+		<li>Project Home: ".dvwaExternalLinkUrlGet( 'http://code.google.com/p/dvwa/' )."</li>
+		<li>Issues: ".dvwaExternalLinkUrlGet( 'http://code.google.com/p/dvwa/issues/list' )."</li>
+		<li>SVN: ".dvwaExternalLinkUrlGet( 'http://dvwa.googlecode.com/svn/trunk/' )."</li>
 
 	</ul>
 
@@ -38,6 +39,7 @@ $page[ 'body' ] .= "
 		<li>Tom Mackenzie: ".dvwaExternalLinkUrlGet( 'http://www.tmacuk.co.uk/','www.tmacuk.co.uk' )."</li>
 		<li>RandomStorm: ".dvwaExternalLinkUrlGet( 'http://www.randomstorm.com/','www.randomstorm.com' )."</li>
 		<li>Jason Jones: ".dvwaExternalLinkUrlGet( 'http://www.linux-ninja.com/','www.linux-ninja.com' )."</li>
+		<li>Brooks Garrett: ".dvwaExternalLinkUrlGet( 'http://brooksgarrett.com/','www.brooksgarrett.com' )."</li>
 	</ul>
 
 	<ul>
@@ -55,7 +57,7 @@ $page[ 'body' ] .= "
 
 	<h2>Development</h2>
 
-	<p>Everyone is welcome to contribute and help make DVWA as successful as it can be. All contributors can have their name and link (if they wish) placed in the credits section. To contribute join the official DVWA forums.</p>
+	<p>Everyone is welcome to contribute and help make DVWA as successful as it can be. All contributors can have their name and link (if they wish) placed in the credits section. To contribute pick an Issue from the Project Home to work on or submit a patch to the Issues list.</p>
 	
 
 </div>

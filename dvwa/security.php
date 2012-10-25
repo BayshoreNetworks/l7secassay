@@ -11,7 +11,6 @@ $page[ 'page_id' ] = 'security';
 
 $securityHtml = '';
 if( isset( $_POST['seclev_submit'] ) ) {
-	//$securityLevel = 'high';
 	$securityLevel = 'low';
 
 	switch( $_POST[ 'security' ] ) {

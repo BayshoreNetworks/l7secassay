@@ -31,6 +31,7 @@ import vars
 import wafw00f
 import itertools
 import urllib
+import logging
 import multiprocessing
 from HTMLGenerator import HTMLGenerator
 from httplib import BadStatusLine
@@ -99,7 +100,7 @@ class DVWAAttacks:
         using wafw00f's API
     """
     def detectWAF(self):
-        #logging.basicConfig(level=40)
+        logging.basicConfig(level=40)
         wf = wafw00f.wafwoof_api()
 
         self.wafDetected = wf.vendordetect(self.url)

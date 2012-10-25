@@ -62,7 +62,8 @@ $page[ 'body' ] .= "
 	<ul>
 		<li>".dvwaExternalLinkUrlGet( 'http://www.securiteam.com/securityreviews/5DP0N1P76E.html')."</li>
 		<li>".dvwaExternalLinkUrlGet( 'http://en.wikipedia.org/wiki/SQL_injection')."</li>
-		<li>".dvwaExternalLinkUrlGet( 'http://www.unixwiz.net/techtips/sql-injection.html')."</li>
+		<li>".dvwaExternalLinkUrlGet( 'http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/')."</li>
+		<li>".dvwaExternalLinkUrlGet( 'http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet')."</li>
 	</ul>
 </div>
 ";
