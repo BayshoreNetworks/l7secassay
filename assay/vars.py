@@ -39,7 +39,7 @@ htmlfileext = ".html"
 user = "admin"
 userpass = "password"
 generateGraphs = False
-useBrowser = True
+useBrowser = False
 successfulVectors = 0
 blockedVectors = 0
 redirtoken = "aHR0cDovL2V4dGVybmFsLmJheXNob3JlbmV0d29ya3MuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA="
