@@ -106,7 +106,8 @@ if __name__=='__main__':
         kick off an initial browser instance
         with an authenticated session
     """
-    #attacks.startUpBrowser()
+    if vars.getUseBrowser():
+        attacks.startUpBrowser()
     """
         dynamically construct the function names based on
         values from the types list/array

@@ -39,6 +39,7 @@ htmlfileext = ".html"
 user = "admin"
 userpass = "password"
 generateGraphs = False
+useBrowser = True
 successfulVectors = 0
 blockedVectors = 0
 redirtoken = "aHR0cDovL2V4dGVybmFsLmJheXNob3JlbmV0d29ya3MuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA="
@@ -54,9 +55,9 @@ typedesc = {
             'xss_s':["Cross-Site Scripting (XSS) Stored Attack", " vectors", "OWASP Top 10 - A2: Cross-Site Scripting (XSS)", 3],
             'sqli':["SQL Injection Attack", " vectors", "OWASP Top 10 - A1: Injection", 4],
             'sqli_blind':["Blind SQL Injection Attack", "", "OWASP Top 10 - A1: Injection", 5],
+            'upload':["File Upload Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
             
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
-            #'upload':["File Upload Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
             }
 
 """
@@ -71,11 +72,11 @@ typecount = {
             'exec':[0,0,0],
             #'csrf':[0,0,0],
             'fi':[0,0,0],
-            'sqli':[0,0,0],
-            #'upload':[0,0,0],
             'xss_r':[0,0,0],
             'xss_s':[0,0,0],
-            'sqli_blind':[0,0,0]
+            'sqli':[0,0,0],
+            'sqli_blind':[0,0,0],
+            'upload':[0,0,0]
             }
 
 def getMalwarePath():
@@ -105,3 +106,6 @@ def getHtmlFileExt():
 
 def getGenerateGraphs():
     return generateGraphs
+
+def getUseBrowser():
+    return useBrowser

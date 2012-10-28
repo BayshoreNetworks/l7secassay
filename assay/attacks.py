@@ -999,11 +999,11 @@ class DVWAAttacks:
                     #print "\n\n**********SQLi - psw hashes: %s\n\n" % r
                     vars.typecount['sqli_blind'][1] += 1
                     self.htmlgen.writeHtmlTableCell(success=True, attackType="Blind SQLi",
-                                            target=targetpage, vect=injection)
+                                                    target=targetpage, vect=injection)
                 else:
                     vars.typecount['sqli_blind'][2] += 1
                     self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
-                                            target=targetpage, vect=injection)
+                                                    target=targetpage, vect=injection)
 
         if len(userhashes) > 0:
             funcs.attackOutPut(funcs.stepFour, "discovered", "User object hashes discovered:")
@@ -1033,7 +1033,7 @@ class DVWAAttacks:
             Looks something like:
             [{'FileControl': 'uploaded', 'HiddenControl': {'MAX_FILE_SIZE': '100000'}}]
         """
-        attackfilename = ["c99.php", "r57.php"]
+        attackfilename = ["c99.php", "r57.php","eicar.com"]
         uploadsuccesstr = "succesfully"
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
         results = []
@@ -1064,13 +1064,18 @@ class DVWAAttacks:
                         malicious backdoor shell has been uploaded,
                         now open this up in a browser to display it
                     """
-                    try:
-                        webbrowser.open(self.url + self.apppath + self.uploadpath + f, new=2, autoraise=True)
-                    except webbrowser.Error:
-                        funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out %s" % self.url + self.apppath + self.uploadpath + f)
+                    if vars.getUseBrowser():
+                        try:
+                            webbrowser.open(self.url + self.apppath + self.uploadpath + f, new=2, autoraise=True)
+                        except webbrowser.Error:
+                            funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out %s" % self.url + self.apppath + self.uploadpath + f)
                     vars.typecount['upload'][1] += 1
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="Malicious Upload",
+                                                    target=targetpage, vect=f)
                 else:
                     vars.typecount['upload'][2] += 1
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Malicious Upload",
+                                                    target=targetpage, vect=f)
         
         else:
             return None
