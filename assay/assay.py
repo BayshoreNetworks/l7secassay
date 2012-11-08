@@ -64,6 +64,7 @@ user = vars.user
 targetloginpage = url+apppath+loginpage
 successfulattacks = {}
 secval = 0
+fp = None
 ##################################################################
 # start prog
 if __name__=='__main__':
@@ -97,11 +98,15 @@ if __name__=='__main__':
         filename: attacks.py
     """
     # create object
-    attacks = attacks.DVWAAttacks(url, apppath)
-    # establish a baseline if its possible
-    attacks.setRedirBaseline(fp=fp, url=url)
-    # set the HTML file prefix
-    attacks.setHTMLFilePrefix(val=secval)
+    if fp:
+        attacks = attacks.DVWAAttacks(url, apppath)
+        # establish a baseline if its possible
+        attacks.setRedirBaseline(fp=fp, url=url)
+        # set the HTML file prefix
+        attacks.setHTMLFilePrefix(val=secval)
+    else:
+        funcs.attackOutPut(funcs.stepTwo, "info", "Something is wrong and I cannot continue, exiting\n\n")
+        sys.exit(0)
     """
         kick off an initial browser instance
         with an authenticated session
