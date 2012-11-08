@@ -18,14 +18,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import base64
+
 # vars
 ##################################################################
 targetproto = "http"
 targetfqdn = "your.site.tld"
 targetport = 80
 yourdomain = "yourdomain.tld"
-exturl = "http://external.%s/" % yourdomain
+exthost = "host
+exturl = "http://%s.%s/" % (exthost,yourdomain)
 extpath = "e4589efff654d91e26b43333dbf41425/"
+extresource = "youshouldnotbehere.php"
 apppath = ""
 loginpage = "login.php"
 loginbypass = "login2.php"
@@ -42,11 +46,11 @@ generateGraphs = False
 useBrowser = False
 successfulVectors = 0
 blockedVectors = 0
-redirtoken = "aHR0cDovL2V4dGVybmFsLmJheXNob3JlbmV0d29ya3MuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA="
+#redirtoken = "aHR0cDovL2V4dGVybmFsLmJheXNob3JlbmV0d29ya3MuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA="
+redirtoken = base64.b64encode(exturl + extpath + extresource)
 ##################################################################
 typedesc = {
             #'brute':["Brute-Force Attack", " vectors", "OWASP Top 10 - A3: Broken Authentication and Session Management", 0],
-            #'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 1],
             #'redir':["Unvalidated Redirect Attack", "", "A10: Unvalidated Redirects and Forwards", 2],
             
             'exec':["Command Execution Attack", " vectors", "OWASP Top 10 - A1: Injection", 0],
@@ -56,7 +60,7 @@ typedesc = {
             'sqli':["SQL Injection Attack", " vectors", "OWASP Top 10 - A1: Injection", 4],
             'sqli_blind':["Blind SQL Injection Attack", "", "OWASP Top 10 - A1: Injection", 5],
             'upload':["File Upload Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
-            
+            'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
             }
 
@@ -67,7 +71,6 @@ typedesc = {
 """
 typecount = {
             #'brute':[0,0,0],
-            #'exposesession':[0,0,0],
             #'redir':[0,0,0],
             'exec':[0,0,0],
             #'csrf':[0,0,0],
@@ -76,7 +79,8 @@ typecount = {
             'xss_s':[0,0,0],
             'sqli':[0,0,0],
             'sqli_blind':[0,0,0],
-            'upload':[0,0,0]
+            'upload':[0,0,0],
+            'exposesession':[0,0,0]
             }
 
 def getMalwarePath():
@@ -109,3 +113,9 @@ def getGenerateGraphs():
 
 def getUseBrowser():
     return useBrowser
+
+def getRedirToken():
+    return redirtoken
+
+def getExtUrl():
+    return exturl + extpath
