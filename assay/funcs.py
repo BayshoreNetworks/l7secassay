@@ -29,6 +29,10 @@ import vars
 from libs.BeautifulSoup import BeautifulSoup as bs
 from libs import HTML
 from datetime import datetime
+from string import letters
+from string import digits
+from random import choice
+from random import randint
 
 stepOne = 5
 stepTwo = 9
@@ -36,6 +40,10 @@ stepThree = 13
 stepFour = 17
 stepFive = 21
 stepSix = 25
+
+def createRandAlpha(length=0):
+    ''' create random alpha strings '''
+    return ''.join(choice(letters) for x in xrange(length or randint(10, 30)))
 
 """
     Simply prints out an opening banner for the prog
