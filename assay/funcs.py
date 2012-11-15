@@ -306,7 +306,7 @@ def doFormDiscovery(fp, target):
             # other than None
             if ff:
                 detectedforms.append(ff)
-    except(socket.gaierror, urllib2.HTTPError), msg:
+    except(socket.gaierror, urllib2.HTTPError, urllib2.URLError), msg:
         attackOutPut(stepFour, "info", msg)
         sys.exit(1)
 
