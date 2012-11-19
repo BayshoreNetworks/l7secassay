@@ -308,7 +308,8 @@ def doFormDiscovery(fp, target):
                 detectedforms.append(ff)
     except(socket.gaierror, urllib2.HTTPError, urllib2.URLError), msg:
         attackOutPut(stepFour, "info", msg)
-        sys.exit(1)
+        #sys.exit(1)
+        
 
     if len(detectedforms) == 1:
         attackOutPut(stepFour, "discovered", "One form detected, using it ...")
