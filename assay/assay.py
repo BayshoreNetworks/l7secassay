@@ -69,9 +69,23 @@ fp = None
 # start prog
 if __name__=='__main__':
     seclevel = 0
-    parser = argparse.ArgumentParser(description='Bayshore Networks - assay')
-    parser.add_argument('-s','--secure', help='level of security in front of DVWA instance (WAF present or not)', required=True)
-    args = parser.parse_args()
+    errmsg = 'level of security in front of DVWA instance (WAF present or not)'
+    try: 
+        parser = argparse.ArgumentParser(description='Bayshore Networks - assay')
+        parser.add_argument('-s','--secure', help=errmsg, required=True)
+        args = parser.parse_args()
+    except:
+        print """
+        
+        Bayshore Networks - assay
+
+        optional arguments:
+        -h, --help            show this help message and exit
+        -s SECURE, --secure SECURE
+                              %s
+                              
+        """ % errmsg
+        sys.exit(0)
 
     if funcs.checkArgs(args.secure):
         secval=int(args.secure)
