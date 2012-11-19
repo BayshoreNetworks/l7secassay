@@ -46,8 +46,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import argparse
 import sys
+try:
+    import argparse
+except ImportError, e:
+    print "Module argparse does not exist or is not accessible, please install that (pip)"
+    sys.exit(0)
 import funcs
 import vars
 import attacks
