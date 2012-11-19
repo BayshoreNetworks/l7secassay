@@ -63,16 +63,36 @@ Steps:
 	Via browser you should be able to hit your instance of the DVWA app and log in using the default creds from step 1.
 	Assuming connectivity is good to go move on to step 3.
 	
-3.	Program run without a WAF in place
+3.	See usage statement:
+
+		python assay.py -h
+		usage: assay.py [-h] -s SECURE
+
+		Bayshore Networks - assay
+
+		optional arguments:
+  		-h, --help            	show this help message and exit
+  		-s SECURE, --secure SECURE
+                        		level of security in front of DVWA instance (WAF present or not)
+	
+4.	Program run without a WAF in place
 
 	Do a run of assay to make sure all is working and you get the baseline of hitting this vulnerable application from within your environment.
 	This will yield a report in HTML called 'pre_waf_datetime.html'
 	datetime is a date/time stamp so an example of a filename is: pre_waf_2012.10.23.20.18.35.html
 	
-4. 	Program run with a WAF in place
+	The run statement for this step is:
+	
+		python assay.py -s 0
+	
+5. 	Program run with a WAF in place
 
 	Do a run of assay to test your WAF solution.
 	This will yield a report in HTML called 'post_waf_datetime.html'
 	datetime is a date/time stamp so an example of a filename is: post_waf_2012.10.23.20.18.35.html
+	
+	The run statement for this step is:
+	
+		python assay.py -s 1
 
 
