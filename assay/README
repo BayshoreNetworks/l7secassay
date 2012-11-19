@@ -74,8 +74,14 @@ Steps:
   		-h, --help            	show this help message and exit
   		-s SECURE, --secure SECURE
                         		level of security in front of DVWA instance (WAF present or not)
+                        		
+4.	Update vars.py by modifying the relevant variables to match your environment:
+
+		targetproto = "http"
+		targetfqdn = "your.site.tld"
+		targetport = 80
 	
-4.	Program run without a WAF in place
+5.	Program run without a WAF in place
 
 	Do a run of assay to make sure all is working and you get the baseline of hitting this vulnerable application from within your environment.
 	This will yield a report in HTML called 'pre_waf_datetime.html'
@@ -85,7 +91,7 @@ Steps:
 	
 		python assay.py -s 0
 	
-5. 	Program run with a WAF in place
+6. 	Program run with a WAF in place
 
 	Do a run of assay to test your WAF solution.
 	This will yield a report in HTML called 'post_waf_datetime.html'
