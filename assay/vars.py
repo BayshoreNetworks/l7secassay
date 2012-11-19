@@ -60,7 +60,7 @@ typedesc = {
             'sqli':["SQL Injection Attack", " vectors", "OWASP Top 10 - A1: Injection", 4],
             'sqli_blind':["Blind SQL Injection Attack", "", "OWASP Top 10 - A1: Injection", 5],
             'upload':["File Upload Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
-            'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
+            #'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
             }
 
@@ -80,7 +80,7 @@ typecount = {
             'sqli':[0,0,0],
             'sqli_blind':[0,0,0],
             'upload':[0,0,0],
-            'exposesession':[0,0,0]
+            #'exposesession':[0,0,0]
             }
 
 def getMalwarePath():
