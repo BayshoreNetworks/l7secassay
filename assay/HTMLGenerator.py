@@ -77,16 +77,26 @@ class HTMLGenerator():
         for key, value in sorted(keyval.iteritems(), key=lambda (k,v): (v,k)):
             if value[0] > 0:
                 if value[1] < 1:
-                    _category = HTML.TableCell(vars.typedesc[key][0],
-                                               attribs={"style":"word-break:break-all",
-                                                        'class':'cell_attack_failed'})
+                    try:
+                        _category = HTML.TableCell(vars.typedesc[key][0],
+                                                   attribs={"style":"word-break:break-all",
+                                                            'class':'cell_attack_failed'})
+                    except KeyError:
+                        _category = HTML.TableCell(key.title(),
+                                                   attribs={"style":"word-break:break-all",
+                                                            'class':'cell_attack_failed'})                        
                     _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_failed'})
                     _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_failed'})
                     _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_failed'})
                 else:
-                    _category = HTML.TableCell(vars.typedesc[key][0],
-                                               attribs={"style":"word-break:break-all",
-                                                        'class':'cell_attack_success'})
+                    try:
+                        _category = HTML.TableCell(vars.typedesc[key][0],
+                                                   attribs={"style":"word-break:break-all",
+                                                            'class':'cell_attack_success'})
+                    except KeyError:
+                        _category = HTML.TableCell(key.title(),
+                                                   attribs={"style":"word-break:break-all",
+                                                            'class':'cell_attack_success'})
                     _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_success'})
                     _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_success'})
                     _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_success'})
