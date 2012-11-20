@@ -162,6 +162,11 @@ if __name__=='__main__':
     wafdetect = attacks.detectWAF()
     if wafdetect:
         funcs.attackOutPut(funcs.stepOne, "discovered", "The following WAF was detected: %s" % wafdetect[0])
+        vars.typecount['recon'][1] += 1
+        attacks.writeWafHtml(val=wafdetect[0])
+    else:
+        vars.typecount['recon'][2] += 1
+        attacks.writeWafHtml(val="")
 
     funcs.printResults(successfulattacks=successfulattacks, url=url)
     funcs.printStats()

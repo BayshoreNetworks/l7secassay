@@ -87,6 +87,14 @@ class DVWAAttacks:
         fh = vars.getHtmlPath() + self.prefix + vars.getHtmlFileName() + funcs.getTimeStamp() + vars.getHtmlFileExt()
         self.htmlgen.saveHTML(fhandle=fh,keyval=vars.typecount)
         funcs.attackOutPut(funcs.stepOne, "info", "HTML was written to file: %s" % fh)
+        
+    def writeWafHtml(self, val=""):
+        if val:
+            self.htmlgen.writeHtmlTableCell(success=True, attackType="Recon",
+                                            target=self.url, vect=val)
+        else:
+            self.htmlgen.writeHtmlTableCell(success=False, attackType="Recon",
+                                            target=self.url, vect="WAF Vendor not detected")
     
     """
         for some of the browser displayed attacks to
@@ -103,6 +111,7 @@ class DVWAAttacks:
         using wafw00f's API
     """
     def detectWAF(self):
+        vars.typecount['recon'][0] += 1
         logging.basicConfig(level=40)
         wf = wafw00f.wafwoof_api()
 
@@ -1072,7 +1081,7 @@ class DVWAAttacks:
         uploadsuccesstr = "succesfully"
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
         results = []
-        mpath = vars.getMalwarePath()
+        #mpath = vars.getMalwarePath()
         resp = ""
 
         attackform = funcs.doFormDiscovery(fp, targetpage)
