@@ -3,7 +3,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2012 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -470,9 +470,10 @@ def printStats():
     for key, value in sorted(vars.typecount.iteritems(), key=lambda (k,v): (v,k)):
         if value[0] > 0:
             try:
-                attackOutPut(stepThree, "info", "%s: Sent: %s, Successful: %s, Failed: %s" % (vars.typedesc[key][0], value[0], value[1], value[2]))
+                atype = vars.typedesc[key][0]
             except KeyError:
-                attackOutPut(stepThree, "info", "%s: Sent: %s, Successful: %s, Failed: %s" % (key.title(), value[0], value[1], value[2]))
+                atype = key.title()
+            attackOutPut(stepThree, "info", "%s: Sent: %s, Successful: %s, Failed: %s" % (atype, value[0], value[1], value[2]))
             succCnt += value[1]
             
     #funcs.attackOutPut(funcs.stepTwo, "info", "%d injected vectors are suspected to be successful" % vars.successfulVectors)

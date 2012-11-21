@@ -4,7 +4,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2012 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,27 +76,21 @@ class HTMLGenerator():
                        attribs={'class':'formtable'})
         for key, value in sorted(keyval.iteritems(), key=lambda (k,v): (v,k)):
             if value[0] > 0:
+                try:
+                    atype = vars.typedesc[key][0]
+                except KeyError:
+                    atype = key.title()
                 if value[1] < 1:
-                    try:
-                        _category = HTML.TableCell(vars.typedesc[key][0],
-                                                   attribs={"style":"word-break:break-all",
-                                                            'class':'cell_attack_failed'})
-                    except KeyError:
-                        _category = HTML.TableCell(key.title(),
-                                                   attribs={"style":"word-break:break-all",
-                                                            'class':'cell_attack_failed'})                        
+                    _category = HTML.TableCell(atype,
+                                               attribs={"style":"word-break:break-all",
+                                                        'class':'cell_attack_failed'})                      
                     _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_failed'})
                     _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_failed'})
                     _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_failed'})
                 else:
-                    try:
-                        _category = HTML.TableCell(vars.typedesc[key][0],
-                                                   attribs={"style":"word-break:break-all",
-                                                            'class':'cell_attack_success'})
-                    except KeyError:
-                        _category = HTML.TableCell(key.title(),
-                                                   attribs={"style":"word-break:break-all",
-                                                            'class':'cell_attack_success'})
+                    _category = HTML.TableCell(atype,
+                                               attribs={"style":"word-break:break-all",
+                                                        'class':'cell_attack_success'})
                     _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_success'})
                     _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_success'})
                     _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_success'})
@@ -110,9 +104,14 @@ class HTMLGenerator():
         for key, value in sorted(keyval.iteritems(), key=lambda (k,v): (v,k)):
             graph = graphs.BarGraph('hBar')
             sarr = []
-            thestr += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tr><td><p>%s - Sent: %s</p></td></tr><tr><td>" % (vars.typedesc[key][0], value[0])
-            # vars.typedesc[key][0]
-            sarr.append(vars.typedesc[key][0])
+            
+            try:
+                atype = vars.typedesc[key][0]
+            except KeyError:
+                atype = key.title()
+            
+            thestr += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tr><td><p>%s - Sent: %s</p></td></tr><tr><td>" % (atype, value[0])
+            sarr.append(atype)
             #thestr += "var s%s = [%s, %s, %s];" % (cnt, value[0], value[1], value[2])
             graph.values.append((value[1], value[2]))
         
