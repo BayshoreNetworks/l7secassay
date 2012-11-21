@@ -3,7 +3,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2012 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ htmlfilename = "waf_"
 htmlfileext = ".html"
 user = "admin"
 userpass = "password"
-generateGraphs = False
+generateGraphs = True
 useBrowser = False
 successfulVectors = 0
 blockedVectors = 0
@@ -81,6 +81,7 @@ typecount = {
             'sqli_blind':[0,0,0],
             'upload':[0,0,0],
             #'exposesession':[0,0,0]
+            'recon':[0,0,0]
             }
 
 def getMalwarePath():
