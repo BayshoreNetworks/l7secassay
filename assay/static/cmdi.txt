@@ -6,8 +6,8 @@
 `id`:::OS Commanding
 ;id;:::OS Commanding
 ;read;:::OS Commanding
-;netstat -a;:::OS Commanding
-\nnetstat -a%\n:::OS Commanding
+;netstat -an;:::OS Commanding
+\nnetstat -an%\n:::OS Commanding
 |id|:::OS Commanding
 |id:::OS Commanding
 |ls:::OS Commanding
