@@ -36,6 +36,7 @@ import urllib
 import urllib2
 import logging
 import multiprocessing
+import fnmatch
 from HTMLGenerator import HTMLGenerator
 from httplib import BadStatusLine
 from urllib2 import URLError
@@ -1075,8 +1076,16 @@ class DVWAAttacks:
         """
         #attackfilename = ["c99.php", "r57.php","eicar.com"]
         attackfilename = []
+        '''
         for infile in glob.glob(os.path.join(vars.getMalwarePath(), '*')):
             attackfilename.append(infile)
+        '''
+        for root, dirs, files in os.walk(vars.getMalwarePath()):
+            for basename in files:
+                if fnmatch.fnmatch(basename, '*'):
+                    filename = os.path.join(root, basename)
+                    if len(filename.split('/')) == 3:
+                        attackfilename.append(filename)
 
         uploadsuccesstr = "succesfully"
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
@@ -1087,7 +1096,7 @@ class DVWAAttacks:
         attackform = funcs.doFormDiscovery(fp, targetpage)
         if attackform:
             for f in attackfilename:
-                fName = f.split('/')[1]
+                fName = f.split('/')[2]
                 resp = ""
                 vars.typecount['upload'][0] += 1
                 try:
@@ -1169,6 +1178,10 @@ class DVWAAttacks:
                 tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
                 vars.typecount['xss_r'][0] += 1
                 if p in tstr:
+                    '''
+                    print p
+                    print tstr
+                    '''
                     discattacks.append(p)
                     #print "\n\n**********XSS: %s\n\n" % p
                     vars.typecount['xss_r'][1] += 1
