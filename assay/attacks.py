@@ -1178,6 +1178,10 @@ class DVWAAttacks:
                 tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
                 vars.typecount['xss_r'][0] += 1
                 if p in tstr:
+                    '''
+                    print p
+                    print tstr
+                    '''
                     discattacks.append(p)
                     #print "\n\n**********XSS: %s\n\n" % p
                     vars.typecount['xss_r'][1] += 1
