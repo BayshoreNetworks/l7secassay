@@ -19,6 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
+import os
+import signal
 import mechanize
 import random
 import re
@@ -404,7 +406,7 @@ def formSubmit(fp, targetpage, formid, formelements, sleep=False):
             time.sleep(5 * random.random())
         # submit form and deal with the response below
         fp.submit()
-
+        #print fp.response().code
         return str(fp.response().read())
     except Exception, e:
         if isBlock(e):
@@ -528,6 +530,24 @@ def checkArgs(value):
     return False
 # EOF
 
+"""
+
+"""
+def checkArgOne(value):
+    value = int(value)
+    if value == 1:
+        return True
+    return False
+# EOF
+
 def getTimeStamp():
     return '%s' % datetime.now().strftime('%Y.%m.%d.%H.%M.%S')
+
+def killPid(ppid=0):
+    try:
+        print "Killing PID %d" % ppid
+        os.kill(int(ppid), signal.SIGTERM)
+    except OSError:
+        pass
+    
 

@@ -25,10 +25,6 @@ Usage Diagram (I will slap a nicer one together over time):
  --------------                 --------------                 --------------
 
 
-Requirements:
-
-	mechanize - http://wwwsearch.sourceforge.net/mechanize/download.html
-
 Steps:
 
 1.	Set up the version of DVWA provided. 

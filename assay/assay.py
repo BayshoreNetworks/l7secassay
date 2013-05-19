@@ -55,6 +55,7 @@ except ImportError, e:
 import funcs
 import vars
 import attacks
+import os
 ##################################################################
 # vars
 url = vars.getUrl()
@@ -69,34 +70,52 @@ targetloginpage = url+apppath+loginpage
 successfulattacks = {}
 secval = 0
 fp = None
+anonFName = ".anon"
 ##################################################################
+if os.path.isfile(anonFName):
+    # delete
+    #print "Removing: %s" % anonFName
+    os.remove(anonFName)
+
+seclevel = 0
+errmsg = 'level of security in front of DVWA instance (WAF present or not)'
+aerrmsg = 'enables the use of tor'
+try: 
+    parser = argparse.ArgumentParser(description='Bayshore Networks - assay')
+    parser.add_argument('-s','--secure', help=errmsg, required=True)
+    parser.add_argument('-a','--anonymize', help=aerrmsg, required=False)
+    args = parser.parse_args()
+except:
+    print """
+    
+    Bayshore Networks - assay
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    -s SECURE, --secure SECURE
+                          %s
+    -a 1, --anonymize 1   %s
+                          
+    """ % (errmsg, aerrmsg)
+    sys.exit(0)
+
+if funcs.checkArgs(args.secure):
+    secval=int(args.secure)
+else:
+    print "\nInvalid sec level\n"
+    sys.exit(0)
+    
+if funcs.checkArgOne(args.anonymize):
+    #aval=int(args.anonymize)
+    fo = open(anonFName, "w")
+    fo.write(args.anonymize)
+    fo.close()
+else:
+    print "\nInvalid tor switch\n"
+    sys.exit(0)
+
 # start prog
 if __name__=='__main__':
-    seclevel = 0
-    errmsg = 'level of security in front of DVWA instance (WAF present or not)'
-    try: 
-        parser = argparse.ArgumentParser(description='Bayshore Networks - assay')
-        parser.add_argument('-s','--secure', help=errmsg, required=True)
-        args = parser.parse_args()
-    except:
-        print """
-        
-        Bayshore Networks - assay
-
-        optional arguments:
-        -h, --help            show this help message and exit
-        -s SECURE, --secure SECURE
-                              %s
-                              
-        """ % errmsg
-        sys.exit(0)
-
-    if funcs.checkArgs(args.secure):
-        secval=int(args.secure)
-    else:
-        print "\nInvalid sec level\n"
-        sys.exit(0)
-    
     ##################################################################
     # print banner
     funcs.printBanner(targetloginpage, user)
@@ -154,11 +173,28 @@ if __name__=='__main__':
                 if type(res) is list:
                     vars.successfulVectors += len(res)
                     successfulattacks[func] = res
+                    
+    '''
+        clean up:
+        - kill tor process we created
+        - delete .anon
+    '''
+    if os.path.isfile(anonFName):
+        # get pid and kill it
+        fo = open("tordata/tor/tor500.pid", "r")
+        tpid = int(fo.read())
+        # close opened file
+        fo.close()
+        funcs.killPid(ppid=tpid)
+        # delete .anon
+        print "Removing: %s" % anonFName
+        os.remove(anonFName)
     ##################################################################
     '''
         output of results to terminal
     '''
     print
+    '''
     wafdetect = attacks.detectWAF()
     if wafdetect:
         funcs.attackOutPut(funcs.stepOne, "discovered", "The following WAF was detected: %s" % wafdetect[0])
@@ -167,8 +203,11 @@ if __name__=='__main__':
     else:
         vars.typecount['recon'][2] += 1
         attacks.writeWafHtml(val="")
+    '''
 
     funcs.printResults(successfulattacks=successfulattacks, url=url)
     funcs.printStats()
     attacks.saveHTML()
     ##################################################################
+
+
