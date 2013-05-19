@@ -534,9 +534,10 @@ def checkArgs(value):
 
 """
 def checkArgOne(value):
-    value = int(value)
-    if value == 1:
-        return True
+    if value:
+        value = int(value)
+        if value == 1:
+            return True
     return False
 # EOF
 
