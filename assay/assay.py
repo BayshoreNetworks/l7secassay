@@ -104,15 +104,12 @@ if funcs.checkArgs(args.secure):
 else:
     print "\nInvalid sec level\n"
     sys.exit(0)
-    
+
 if funcs.checkArgOne(args.anonymize):
     #aval=int(args.anonymize)
     fo = open(anonFName, "w")
     fo.write(args.anonymize)
     fo.close()
-else:
-    print "\nInvalid tor switch\n"
-    sys.exit(0)
 
 # start prog
 if __name__=='__main__':

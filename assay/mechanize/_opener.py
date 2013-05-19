@@ -8,6 +8,11 @@ COPYING.txt included with the distribution).
 
 """
 ############################################################################
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+'''
+    everything between the XX..'s has to happen before
+    the import of urllib2
+'''
 """
     was in a rush and didnt pursue the most
     elegant solution to get a switch over to
@@ -30,6 +35,7 @@ print type(astr)
 if astr == 1:
     import hashlib
     import binascii
+    
     ''' based on https://gist.github.com/3962751 '''
     def createTorPassword(secret = ""):
         ind = chr(96)
@@ -68,7 +74,7 @@ if astr == 1:
         
         return prefix + salt + ind + torhash
     
-    # create tor socket here
+    # create tor process here
     import subprocess
     
     torpath = "/Applications/Vidalia.app/Contents/MacOS/tor"
@@ -129,7 +135,7 @@ if astr == 1:
             --DataDirectory data/tor4
     '''
     sp = subprocess.Popen(runstmt)
-    torpid = sp.pid
+    #torpid = sp.pid
 
 '''
     use an existing tor socket here
@@ -149,6 +155,7 @@ if astr == 1:
     socket.create_connection = create_connection
 
 #import os, urllib2, bisect, httplib, types, tempfile
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ############################################################################
 import urllib2, bisect, httplib, types, tempfile
 try:

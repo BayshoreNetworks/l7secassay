@@ -1,11 +1,11 @@
 The purpose of this software is to give users the ability to test the effectiveness of their WAF solution(s).
 
-****************************************************************************************************************************
-**** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! ****
+*****************************************************************************************************************************
+**** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! 	****
 **** PELIGRO: if you forget to clean these files up you may have a gaping hole in your infrastructure. 			****
 **** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. 		****
 **** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server)		****
-****************************************************************************************************************************
+*****************************************************************************************************************************
 
 Use Case/Scenario:
 
@@ -23,6 +23,10 @@ Usage Diagram (I will slap a nicer one together over time):
  |            |                 |            |                 |            |
  |            |                 |            |                 |            |
  --------------                 --------------                 --------------
+
+Requirements:
+
+- Tor executable if you want to use the anonymize function
 
 
 Steps:
@@ -74,41 +78,70 @@ Steps:
 		Bayshore Networks - assay
 
 		optional arguments:
-  		-h, --help            	show this help message and exit
-  		-s SECURE, --secure SECURE
+		-h, --help            	show this help message and exit
+		-s SECURE, --secure SECURE
                         		level of security in front of DVWA instance (WAF present or not)
+		-a 1, --anonymize 1   enables the use of tor
+
+	Examples:
+
+		To run thru a WAF using no SOCKS proxy:
+
+		python assay.py -s1
+
+
+		To run thru a WAF using a SOCKS proxy:
+
+		python assay.py -s1 -a1
+
+
+		To run directly against DVWA using no SOCKS proxy:
+
+		python assay.py -s0
+
+
+		To run directly against DVWA using a SOCKS proxy:
+
+		python assay.py -s0 -a1
+
                         		
 4.	Update vars.py by modifying the relevant variables to match your environment:
 
 		targetproto = "http"
 		targetfqdn = "your.site.tld"
 		targetport = 80
-	
-5.	Program run without a WAF in place
+
+5.	If you are going to use the anonymize option then you must modify file mechanize/_opener.py
+	Update the value for variable torpath to match your environment. By default it looks like this: 
+
+		torpath = "/Applications/Vidalia.app/Contents/MacOS/tor" 
+
+
+6.	Program run without a WAF in place
 
 	Do a run of assay to make sure all is working and you get the baseline of hitting this vulnerable application from within your environment.
 	This will yield a report in HTML called 'pre_waf_datetime.html'
 	datetime is a date/time stamp so an example of a filename is: pre_waf_2012.10.23.20.18.35.html
 	
-	The run statement for this step is:
+	An example run statement for this step is:
 	
-		python assay.py -s 0
+		python assay.py -s0 -a1
 	
-6. 	Program run with a WAF in place
+7. 	Program run with a WAF in place
 
 	Do a run of assay to test your WAF solution.
 	This will yield a report in HTML called 'post_waf_datetime.html'
 	datetime is a date/time stamp so an example of a filename is: post_waf_2012.10.23.20.18.35.html
 	
-	The run statement for this step is:
+	An example run statement for this step is:
 	
-		python assay.py -s 1
+		python assay.py -s1 -a1
 
-****************************************************************************************************************************
-**** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! ****
+*****************************************************************************************************************************
+**** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! 	****
 **** PELIGRO: if you forget to clean these files up you may have a gaping hole in your infrastructure. 			****
 **** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. 		****
 **** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server)		****
-****************************************************************************************************************************
+*****************************************************************************************************************************
 
 
