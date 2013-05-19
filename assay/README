@@ -74,9 +74,32 @@ Steps:
 		Bayshore Networks - assay
 
 		optional arguments:
-  		-h, --help            	show this help message and exit
-  		-s SECURE, --secure SECURE
+		-h, --help            	show this help message and exit
+		-s SECURE, --secure SECURE
                         		level of security in front of DVWA instance (WAF present or not)
+		-a 1, --anonymize 1   enables the use of tor
+
+	Examples:
+
+		To run thru a WAF using no SOCKS proxy:
+
+		python assay.py -s1
+
+
+		To run thru a WAF using a SOCKS proxy:
+
+		python assay.py -s1 -a1
+
+
+		To run directly against DVWA using no SOCKS proxy:
+
+		python assay.py -s0
+
+
+		To run directly against DVWA using a SOCKS proxy:
+
+		python assay.py -s0 -a1
+
                         		
 4.	Update vars.py by modifying the relevant variables to match your environment:
 
@@ -92,7 +115,7 @@ Steps:
 	
 	The run statement for this step is:
 	
-		python assay.py -s 0
+		python assay.py -s 0 -a 1
 	
 6. 	Program run with a WAF in place
 
@@ -102,7 +125,7 @@ Steps:
 	
 	The run statement for this step is:
 	
-		python assay.py -s 1
+		python assay.py -s 1 -a 1
 
 ****************************************************************************************************************************
 **** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! ****
