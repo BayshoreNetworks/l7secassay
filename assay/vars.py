@@ -3,7 +3,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2014 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ targetpath = "vulnerabilities%s" % slash
 malwarepath = "malware%s" % slash
 staticpath = "static%s" % slash
 htmlpath = "html%s" % slash
+hackableuploadpath = "hackable%suploads%s" % (slash, slash)
 htmlfilename = "waf_"
 htmlfileext = ".html"
 user = "admin"
@@ -59,9 +60,10 @@ typedesc = {
             'xss_s':["Cross-Site Scripting (XSS) Stored Attack", " vectors", "OWASP Top 10 - A2: Cross-Site Scripting (XSS)", 3],
             'sqli':["SQL Injection Attack", " vectors", "OWASP Top 10 - A1: Injection", 4],
             'sqli_blind':["Blind SQL Injection Attack", "", "OWASP Top 10 - A1: Injection", 5],
-            'upload':["File Upload Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
+            'upload':["File Upload (Ingress) Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
             #'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
+            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 7],
             }
 
 """
@@ -80,9 +82,15 @@ typecount = {
             'sqli':[0,0,0],
             'sqli_blind':[0,0,0],
             'upload':[0,0,0],
+            'download':[0,0,0],
             #'exposesession':[0,0,0]
             'recon':[0,0,0]
             }
+
+download_file_sigs = {'c99.bin':'74f1048753ed36a1de4f0d8b28dd78f5',
+                      'ce014b08ae5d68a3eafd95807285e2cd':'ce014b08ae5d68a3eafd95807285e2cd',
+                      'y3ym.exe':'5c0b7198187a971112a3e504c3ab9369'
+                      }
 
 def getMalwarePath():
     return malwarepath
@@ -121,3 +129,6 @@ def getRedirToken():
 def getExtUrl():
     return exturl + extpath
 
+def getHackableUploadPath():
+    return hackableuploadpath
+    

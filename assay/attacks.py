@@ -5,7 +5,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2014 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1082,10 +1082,11 @@ class DVWAAttacks:
         '''
         for root, dirs, files in os.walk(vars.getMalwarePath()):
             for basename in files:
-                if fnmatch.fnmatch(basename, '*'):
-                    filename = os.path.join(root, basename)
-                    if len(filename.split('/')) == 3:
-                        attackfilename.append(filename)
+                if not basename.startswith('.'):
+                    if fnmatch.fnmatch(basename, '*'):
+                        filename = os.path.join(root, basename)
+                        if len(filename.split('/')) == 3:
+                            attackfilename.append(filename)
 
         uploadsuccesstr = "succesfully"
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
@@ -1265,6 +1266,54 @@ class DVWAAttacks:
 
         return "attackredir"
     # EOF
+    
+    """
+    
+    """
+    def attackdownload(self, fp, targetpage):
+        # modify target page
+        targetpage = vars.getUrl() + vars.getHackableUploadPath()
+        results = []
+        
+        flist = funcs.getServerMalwareList(fp, targetpage)
+        for f in flist:
+            dfile = ""
+            tpage = targetpage + f[1]
+
+            try:
+                dfile = fp.retrieve(tpage)[0]
+            except:
+                continue
+            
+            # make sure we get content back from site
+            if dfile:
+                # make sure we have content to compare with
+                if vars.download_file_sigs.has_key(f[1]):
+                    vars.typecount['download'][0] += 1
+                    
+                    m = hashlib.md5()
+                    fl = open(dfile, 'r')
+                    m.update(fl.read())
+                    fhex = m.hexdigest()
+                    fl.close()
+                    
+                    if vars.download_file_sigs[f[1]] == fhex:
+                        results.append("Malware: \"%s\" (%s) downloaded" % (f[1],fhex))
+                        vars.typecount['download'][1] += 1
+                        self.htmlgen.writeHtmlTableCell(success=True, attackType="Malware Download",
+                                                        target=tpage, vect=f[1])
+                    else:
+                        vars.typecount['download'][2] += 1
+                        self.htmlgen.writeHtmlTableCell(success=False, attackType="Malware Download",
+                                                        target=tpage, vect=f[1])
+                            
+                            
+        if len(results) > 0:
+            return results
+        else:
+            return None
+
+ 
 
     """
         A wrapper function so that the calling end of

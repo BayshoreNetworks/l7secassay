@@ -3,7 +3,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2014 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -550,5 +550,21 @@ def killPid(ppid=0):
         os.kill(int(ppid), signal.SIGTERM)
     except OSError:
         pass
+    
+def getServerMalwareList(fp, targetpage):
+    attackOutPut(stepThree, "step", "Attempting to read list of files that can be downloaded from %s" % targetpage)
+    
+    type_ignores = ['ICO', 'DIR']
+    targfiles = []
+    fp.open(targetpage)
+    retstr = fp.response().read()
+    
+    #for i in re.findall('href="(.+?)"', retstr):
+    for i in re.findall('alt="\[(.+?)\]".+?href="(.+?)"', retstr):
+        if i[0] not in type_ignores:
+            attackOutPut(stepFour, "discovered", "Malware: \"%s\" can be downloaded" % i[1])
+            targfiles.append(i)
+        
+    return targfiles
     
 
