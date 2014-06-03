@@ -9,9 +9,6 @@ Be forewarned:
 
 Use and/or clone at your own risk:
 
-*****************************************************************************************************************************
-**** WARNING: Contains live Malware because it is the only to properly test some of the features of interest when 	****
-**** PELIGRO: targeting these types of initiatives. 									****
-**** ACHTUNG: 														****
-**** CONSCIA: 														****
-*****************************************************************************************************************************
+*****************************************************************************************
+**** WARNING: Contains live Malware … it is the only way to properly test these features
+*****************************************************************************************
