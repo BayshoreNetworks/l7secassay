@@ -1082,10 +1082,11 @@ class DVWAAttacks:
         '''
         for root, dirs, files in os.walk(vars.getMalwarePath()):
             for basename in files:
-                if fnmatch.fnmatch(basename, '*'):
-                    filename = os.path.join(root, basename)
-                    if len(filename.split('/')) == 3:
-                        attackfilename.append(filename)
+                if not basename.startswith('.'):
+                    if fnmatch.fnmatch(basename, '*'):
+                        filename = os.path.join(root, basename)
+                        if len(filename.split('/')) == 3:
+                            attackfilename.append(filename)
 
         uploadsuccesstr = "succesfully"
         regUploadSuccess = re.compile(uploadsuccesstr,re.I+re.MULTILINE)
