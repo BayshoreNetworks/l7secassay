@@ -3,7 +3,7 @@
     
     License:
     assay
-    Copyright (C) 2010 - 2014 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2015 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,8 +51,9 @@ def createRandAlpha(length=0):
     Simply prints out an opening banner for the prog
 """
 def printBanner(loginpage, user):
-    attackOutPut(stepOne, "info", "Bayshore Networks, Inc. - assay [DVWA Web App Attack]")
-    attackOutPut(stepOne, "info", "-------------------------------------")
+    #attackOutPut(stepOne, "info", "Bayshore Networks, Inc. - assay [DVWA Web App Attack]")
+    #attackOutPut(stepOne, "info", "-------------------------------------")
+    print
     attackOutPut(stepOne, "info", "Target: %s" % loginpage)
     attackOutPut(stepOne, "info", "Target User: %s" % user)
     print
@@ -99,6 +100,7 @@ def doLogin(targetloginpage):
         return fp
     else:
         attackOutPut(stepOne, "nothingfound", "Authentication is NOT successful, exiting :-[\n")
+        clean_up_tor()
         sys.exit()
 # EOF
 
@@ -174,12 +176,12 @@ def doLoginFormDiscovery(target):
         nfp.close()
     except(socket.gaierror, urllib2.HTTPError), msg:
         attackOutPut(stepFour, "info", msg)
+        clean_up_tor()
         sys.exit(1)
 
     # process form data
     if len(detectedforms) < 1:
         attackOutPut(stepFour, "nothingfound", "Sorry no forms detected for attacking")
-        #sys.exit(0)
     # optimal
     if len(detectedforms) == 1:
         attackOutPut(stepFour, "discovered", "One form detected, using it ...")
@@ -194,9 +196,9 @@ def doLoginFormDiscovery(target):
             for k, v in detectedforms[0]['HiddenControl'].items():
                 attackOutPut(stepSix, "discovered", "%s = %s" % (k, v))
         print
-        #sys.exit(0)
     if len(detectedforms) > 1:
         attackOutPut(stepFour, "discovered", "More than one form detected, exiting")
+        clean_up_tor()
         sys.exit(0)
 
     if hiddenfields:
@@ -310,7 +312,6 @@ def doFormDiscovery(fp, target):
                 detectedforms.append(ff)
     except(socket.gaierror, urllib2.HTTPError, urllib2.URLError), msg:
         attackOutPut(stepFour, "info", msg)
-        #sys.exit(1)
         
 
     if len(detectedforms) == 1:
@@ -546,7 +547,7 @@ def getTimeStamp():
 
 def killPid(ppid=0):
     try:
-        print "Killing PID %d" % ppid
+        print "\nKilling PID %d\n" % ppid
         os.kill(int(ppid), signal.SIGTERM)
     except OSError:
         pass
@@ -562,9 +563,19 @@ def getServerMalwareList(fp, targetpage):
     #for i in re.findall('href="(.+?)"', retstr):
     for i in re.findall('alt="\[(.+?)\]".+?href="(.+?)"', retstr):
         if i[0] not in type_ignores:
-            attackOutPut(stepFour, "discovered", "Malware: \"%s\" can be downloaded" % i[1])
+            attackOutPut(stepFour, "discovered", "File: \"%s\" is visible" % i[1])
             targfiles.append(i)
         
     return targfiles
+
+def clean_up_tor():
+    tor_pid_file = "tordata/tor/tor500.pid"
+    if os.path.isfile(tor_pid_file):
+        # get pid and kill it
+        fo = open(tor_pid_file, "r")
+        tpid = int(fo.read())
+        # close opened file
+        fo.close()
+        killPid(ppid=tpid)
     
 

@@ -31,7 +31,7 @@
         
     License:
     assay
-    Copyright (C) 2010 - 2014 Bayshore Networks, Inc.
+    Copyright (C) 2010 - 2015 Bayshore Networks, Inc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,12 +47,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
+import funcs
 try:
     import argparse
 except ImportError, e:
     print "Module argparse does not exist or is not accessible, please install that (pip)"
+    funcs.clean_up_tor()
     sys.exit(0)
-import funcs
 import vars
 import attacks
 import os
@@ -97,12 +98,14 @@ except:
     -a 1, --anonymize 1   %s
                           
     """ % (errmsg, aerrmsg)
+    funcs.clean_up_tor()
     sys.exit(0)
 
 if funcs.checkArgs(args.secure):
     secval=int(args.secure)
 else:
     print "\nInvalid sec level\n"
+    funcs.clean_up_tor()
     sys.exit(0)
 
 if funcs.checkArgOne(args.anonymize):
@@ -140,6 +143,7 @@ if __name__=='__main__':
         attacks.setHTMLFilePrefix(val=secval)
     else:
         funcs.attackOutPut(funcs.stepTwo, "info", "Something is wrong and I cannot continue, exiting\n\n")
+        funcs.clean_up_tor()
         sys.exit(0)
     """
         kick off an initial browser instance
