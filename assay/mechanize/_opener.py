@@ -10,9 +10,65 @@ COPYING.txt included with the distribution).
 ############################################################################
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 '''
+    mods by Andres Andreu <andres [at] neurofuzzsecurity dot com>
+'''
+
+'''
     everything between the XX..'s has to happen before
     the import of urllib2
 '''
+import os
+tor_exe = None
+
+def which(program):
+    def is_exe(fpath):
+        return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+
+    def ext_candidates(fpath):
+        yield fpath
+        for ext in os.environ.get("PATHEXT", "").split(os.pathsep):
+            yield fpath + ext
+
+    fpath, fname = os.path.split(program)
+    '''
+    print fpath
+    print fname
+    '''
+    # check same dir first
+    if is_exe(fname):
+        return fname
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            for candidate in ext_candidates(exe_file):
+                if is_exe(candidate):
+                    return candidate
+    return None
+
+def attackOutPut(n, status, s):
+    #stats = ['[+]','[-]','[!]','[>]']
+    stats = {
+            "step":'[>]',
+            "info":'[!]',
+            "discovered":'[+]',
+            "nothingfound":'[-]'
+            }
+    print " "*n + stats[status] + " " + str(s)
+    
+'''
+    this is ugly but I wanted it to print
+    before the tor statement (if there is one)
+'''
+
+print
+stepOne = 5
+attackOutPut(stepOne, "info", "Bayshore Networks, Inc. - assay [DVWA Web App Attack]")
+attackOutPut(stepOne, "info", "-------------------------------------")
+
+tor_exe = which('tor')
 """
     was in a rush and didnt pursue the most
     elegant solution to get a switch over to
@@ -20,7 +76,6 @@ COPYING.txt included with the distribution).
     so I just did it via a small hidden file
     its ugly but it works ....
 """
-import os
 anonFName = ".anon"
 astr = 0
 if os.path.isfile(anonFName):
@@ -28,131 +83,138 @@ if os.path.isfile(anonFName):
     astr = int(fo.read(1));
     # close opened file
     fo.close()
+
 '''
-print astr
-print type(astr)
+    only enter if we have a tor executable
+    to play with
 '''
-if astr == 1:
-    import hashlib
-    import binascii
-    
-    ''' based on https://gist.github.com/3962751 '''
-    def createTorPassword(secret = ""):
-        ind = chr(96)
-        
-        # for salt
-        rng = os.urandom
-        # generate salt and append indicator value so that it
-        salt = "%s%s" % (rng(8), ind)
-        
-        prefix = '16:'
-        c = ord(salt[8])
-        
-        EXPBIAS = 6
-        count = (16+(c&15)) << ((c>>4) + EXPBIAS)
-        
-        d = hashlib.sha1()
-        tmp = salt[:8]+secret
-        
-        '''
-            hash the salty password as many times as the length of
-            the password divides into the count value
-        '''
-        slen = len(tmp)
-        while count:
-          if count > slen:
-            d.update(tmp)
-            count -= slen
-          else:
-            d.update(tmp[:count])
-            count = 0
-        hashed = d.digest()
-        # convert to hex
-        salt = binascii.b2a_hex(salt[:8]).upper()
-        ind = binascii.b2a_hex(ind)
-        torhash = binascii.b2a_hex(hashed).upper()
-        
-        return prefix + salt + ind + torhash
-    
-    # create tor process here
-    import subprocess
-    
-    torpath = "/Applications/Vidalia.app/Contents/MacOS/tor"
-    datadir = './tordata'
-    torarguments = {"--RunAsDaemon":'1',
-                    "--CookieAuthentication":'0',
-                    "--HashedControlPassword":createTorPassword(secret="abcde"),
-                    "--ControlPort":'%s',
-                    "--PidFile":'tor%s.pid',
-                    "--SocksPort":'%s',
-                    "--DataDirectory":datadir + '/tor'
-                    }
+if tor_exe and astr == 1:
+    attackOutPut(stepOne, "info", "Using tor, discovered at: %s\n" % tor_exe)
     '''
-        first create data file
-        Simply opening a file in write mode will create it, if it doesn't exist. 
-        If the file does exist, the act of opening it in write mode will completely
-        overwrite its contents
+    print astr
+    print type(astr)
     '''
-    f = open(datadir + '/tor/assaytor', "w")
-    
-    runstmt = []
-    runstmt.append(torpath)
-    base_socks_port = 9152
-    base_control_port = 8220
-    bsp = str(base_socks_port)
-    bcp = str(base_control_port)
+    if astr == 1:
+        import hashlib
+        import binascii
+        
+        ''' based on https://gist.github.com/3962751 '''
+        def createTorPassword(secret = ""):
+            ind = chr(96)
             
-    for k in torarguments.iterkeys():
-        if k == '--ControlPort':
-            runstmt.append(k)
-            runstmt.append(torarguments[k] % bcp)
-        elif k == '--PidFile':
-            runstmt.append(k)
-            runstmt.append(torarguments[k] % str(500))
-        elif k == '--SocksPort':
-            runstmt.append(k)
-            runstmt.append(torarguments[k] % bsp)
-        elif k == '--DataDirectory':
-            runstmt.append(k)
-            runstmt.append(torarguments[k])
-        else:
-            runstmt.append(k)
-            runstmt.append(torarguments[k])
-    '''
-    print
-    print runstmt
-    print
-    '''
-    '''
-        notes:
+            # for salt
+            rng = os.urandom
+            # generate salt and append indicator value so that it
+            salt = "%s%s" % (rng(8), ind)
+            
+            prefix = '16:'
+            c = ord(salt[8])
+            
+            EXPBIAS = 6
+            count = (16+(c&15)) << ((c>>4) + EXPBIAS)
+            
+            d = hashlib.sha1()
+            tmp = salt[:8]+secret
+            
+            '''
+                hash the salty password as many times as the length of
+                the password divides into the count value
+            '''
+            slen = len(tmp)
+            while count:
+              if count > slen:
+                d.update(tmp)
+                count -= slen
+              else:
+                d.update(tmp[:count])
+                count = 0
+            hashed = d.digest()
+            # convert to hex
+            salt = binascii.b2a_hex(salt[:8]).upper()
+            ind = binascii.b2a_hex(ind)
+            torhash = binascii.b2a_hex(hashed).upper()
+            
+            return prefix + salt + ind + torhash
         
-        tor --RunAsDaemon 1 
-            --CookieAuthentication 0 
-            --HashedControlPassword 16:3209E94C0EEF6A9660D0645B037E16730B553C627462CD233F33B0F950
-            --ControlPort 8124
-            --PidFile tor4.pid 
-            --SocksPort 9056 
-            --DataDirectory data/tor4
-    '''
-    sp = subprocess.Popen(runstmt)
-    #torpid = sp.pid
-
-'''
-    use an existing tor socket here
-'''
-if astr == 1:
-    import socks
-    import socket
-    def create_connection(address, timeout=None, source_address=None):
-        sock = socks.socksocket()
-        sock.connect(address)
-        return sock
-
-    socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", base_socks_port)
+        # create tor process here
+        import subprocess
+        
+        torpath = tor_exe
+        datadir = './tordata'
+        torarguments = {"--RunAsDaemon":'1',
+                        "--CookieAuthentication":'0',
+                        "--HashedControlPassword":createTorPassword(secret="abcde"),
+                        "--ControlPort":'%s',
+                        "--PidFile":'tor%s.pid',
+                        "--SocksPort":'%s',
+                        "--DataDirectory":datadir + '/tor'
+                        }
+        '''
+            first create data file
+            Simply opening a file in write mode will create it, if it doesn't exist. 
+            If the file does exist, the act of opening it in write mode will completely
+            overwrite its contents
+        '''
+        f = open(datadir + '/tor/assaytor', "w")
+        
+        runstmt = []
+        runstmt.append(torpath)
+        base_socks_port = 9152
+        base_control_port = 8220
+        bsp = str(base_socks_port)
+        bcp = str(base_control_port)
+                
+        for k in torarguments.iterkeys():
+            if k == '--ControlPort':
+                runstmt.append(k)
+                runstmt.append(torarguments[k] % bcp)
+            elif k == '--PidFile':
+                runstmt.append(k)
+                runstmt.append(torarguments[k] % str(500))
+            elif k == '--SocksPort':
+                runstmt.append(k)
+                runstmt.append(torarguments[k] % bsp)
+            elif k == '--DataDirectory':
+                runstmt.append(k)
+                runstmt.append(torarguments[k])
+            else:
+                runstmt.append(k)
+                runstmt.append(torarguments[k])
+        '''
+        print
+        print runstmt
+        print
+        '''
+        '''
+            notes:
+            
+            tor --RunAsDaemon 1 
+                --CookieAuthentication 0 
+                --HashedControlPassword 16:3209E94C0EEF6A9660D0645B037E16730B553C627462CD233F33B0F950
+                --ControlPort 8124
+                --PidFile tor4.pid 
+                --SocksPort 9056 
+                --DataDirectory data/tor4
+        '''
+        sp = subprocess.Popen(runstmt)
+        #torpid = sp.pid
     
-    # patch the socket module
-    socket.socket = socks.socksocket
-    socket.create_connection = create_connection
+    '''
+        use an existing tor socket here
+    '''
+    if astr == 1:
+        import socks
+        import socket
+        def create_connection(address, timeout=None, source_address=None):
+            sock = socks.socksocket()
+            sock.connect(address)
+            return sock
+    
+        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", base_socks_port)
+        
+        # patch the socket module
+        socket.socket = socks.socksocket
+        socket.create_connection = create_connection
 
 #import os, urllib2, bisect, httplib, types, tempfile
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
