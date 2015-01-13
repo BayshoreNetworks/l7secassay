@@ -564,7 +564,7 @@ def getServerMalwareList(fp, targetpage):
     for i in re.findall('alt="\[(.+?)\]".+?href="(.+?)"', retstr):
         if i[0] not in type_ignores:
             attackOutPut(stepFour, "discovered", "File: \"%s\" is visible" % i[1])
-            targfiles.append(i)
+            targfiles.append(i[1])
         
     return targfiles
 
@@ -577,5 +577,16 @@ def clean_up_tor():
         # close opened file
         fo.close()
         killPid(ppid=tpid)
+        
+def is_target_up(fp=''):
+    resp = None
+    request = urllib2.Request(vars.getUrl())
+    response = fp.open(request)
+    resp = str(response.code)
+    if resp:
+        return True
+    else:
+        return False
+
     
 
