@@ -20,5 +20,5 @@ directory on your system:
 
     a2enmod cgid
     service apache2 reload
-    cp ./l7assay/dvwa/vulnerabilities/shellshock.cgi /usr/lib/cgi-bin/
+    cp ./l7assay/dvwa/vulnerabilities/shellshock/shellshock.cgi /usr/lib/cgi-bin/
     chmod +x  /usr/lib/cgi-bin/shellshock.cgi
