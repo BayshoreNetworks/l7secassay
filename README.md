@@ -17,7 +17,8 @@ For the shellshock test to function, you must enable cgi on Apache and copy the 
 directory on your system:
 
   For example, on Ubuntu 14.04:
-    a2enmod cgid
-    service apache2 reload
-    cp ./l7assay/dvwa/vulnerabilities/shellshock.cgi /usr/lib/cgi-bin/
-    chmod +x  /usr/lib/cgi-bin/shellshock.cgi
+
+  a2enmod cgid
+  service apache2 reload
+  cp ./l7assay/dvwa/vulnerabilities/shellshock.cgi /usr/lib/cgi-bin/
+  chmod +x  /usr/lib/cgi-bin/shellshock.cgi
