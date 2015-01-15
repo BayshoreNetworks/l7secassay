@@ -20,16 +20,31 @@
 """
 import base64
 
-# vars
+# vars you need to manage
 ##################################################################
+# DVWA info
 targetproto = "http"
 targetfqdn = "your.site.tld"
 targetport = 80
+user = "admin"
+userpass = "password"
+dvwa_server_path = "/web/server/dvwa/hackable/uploads/"
+
+'''
+    external host info - optional
+'''
 yourdomain = "yourdomain.tld"
 exthost = "host"
 exturl = "http://%s.%s/" % (exthost,yourdomain)
 extpath = "e4589efff654d91e26b43333dbf41425/"
 extresource = "youshouldnotbehere.php"
+
+# output info
+generateGraphs = True
+useBrowser = False
+##################################################################
+# do not touch anything below this line
+##################################################################
 apppath = ""
 loginpage = "login.php"
 loginbypass = "login2.php"
@@ -41,15 +56,11 @@ htmlpath = "html%s" % slash
 hackableuploadpath = "hackable%suploads%s" % (slash, slash)
 htmlfilename = "waf_"
 htmlfileext = ".html"
-user = "admin"
-userpass = "password"
-generateGraphs = True
-useBrowser = False
 successfulVectors = 0
 blockedVectors = 0
 #redirtoken = "aHR0cDovL2V4dGVybmFsLmJheXNob3JlbmV0d29ya3MuY29tL2U0NTg5ZWZmZjY1NGQ5MWUyNmI0MzMzM2RiZjQxNDI1L3lvdXNob3VsZG5vdGJlaGVyZS5waHA="
 redirtoken = base64.b64encode(exturl + extpath + extresource)
-##################################################################
+
 typedesc = {
             #'brute':["Brute-Force Attack", " vectors", "OWASP Top 10 - A3: Broken Authentication and Session Management", 0],
             #'redir':["Unvalidated Redirect Attack", "", "A10: Unvalidated Redirects and Forwards", 2],
@@ -63,7 +74,8 @@ typedesc = {
             'upload':["File Upload (Ingress) Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
             #'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
-            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 7],
+            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 8],
+            'request_headers':["HTTP Request Header Attack", " vectors", "OWASP ???", 1],
             }
 
 """
@@ -84,7 +96,8 @@ typecount = {
             'upload':[0,0,0],
             'download':[0,0,0],
             #'exposesession':[0,0,0]
-            'recon':[0,0,0]
+            'recon':[0,0,0],
+            'request_headers':[0,0,0]
             }
 
 download_file_sigs = {'c99.bin':'74f1048753ed36a1de4f0d8b28dd78f5',
