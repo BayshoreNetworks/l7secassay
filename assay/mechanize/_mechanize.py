@@ -250,9 +250,10 @@ class Browser(UserAgentBase):
             response = copy.copy(self._response)
         elif response is not None:
             response = _response.upgrade_response(response)
-
+        '''
         if not success:
             raise response
+        '''
         return response
 
     def __str__(self):
