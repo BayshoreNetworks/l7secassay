@@ -1275,38 +1275,44 @@ class DVWAAttacks:
         # modify target page
         targetpage = vars.getUrl() + vars.getHackableUploadPath()
         results = []
+        flist = None
         
-        flist = funcs.getServerMalwareList(fp, targetpage)
-        for f in flist:
-            dfile = ""
-            tpage = targetpage + f
-
-            try:
-                dfile = fp.retrieve(tpage)[0]
-            except:
-                continue
+        try:
+            flist = funcs.getServerMalwareList(fp, targetpage)
+        except:
+            pass
             
-            # make sure we get content back from site
-            if dfile:
-                # make sure we have content to compare with
-                if vars.download_file_sigs.has_key(f):
-                    vars.typecount['download'][0] += 1
-                    
-                    m = hashlib.md5()
-                    fl = open(dfile, 'r')
-                    m.update(fl.read())
-                    fhex = m.hexdigest()
-                    fl.close()
-                    
-                    if vars.download_file_sigs[f] == fhex:
-                        results.append("Malware: \"%s\" (%s) downloaded" % (f,fhex))
-                        vars.typecount['download'][1] += 1
-                        self.htmlgen.writeHtmlTableCell(success=True, attackType="Malware Download",
-                                                        target=tpage, vect=f)
-                    else:
-                        vars.typecount['download'][2] += 1
-                        self.htmlgen.writeHtmlTableCell(success=False, attackType="Malware Download",
-                                                        target=tpage, vect=f)
+        if flist:
+            for f in flist:
+                dfile = ""
+                tpage = targetpage + f
+    
+                try:
+                    dfile = fp.retrieve(tpage)[0]
+                except:
+                    continue
+                
+                # make sure we get content back from site
+                if dfile:
+                    # make sure we have content to compare with
+                    if vars.download_file_sigs.has_key(f):
+                        vars.typecount['download'][0] += 1
+                        
+                        m = hashlib.md5()
+                        fl = open(dfile, 'r')
+                        m.update(fl.read())
+                        fhex = m.hexdigest()
+                        fl.close()
+                        
+                        if vars.download_file_sigs[f] == fhex:
+                            results.append("Malware: \"%s\" (%s) downloaded" % (f,fhex))
+                            vars.typecount['download'][1] += 1
+                            self.htmlgen.writeHtmlTableCell(success=True, attackType="Malware Download",
+                                                            target=tpage, vect=f)
+                        else:
+                            vars.typecount['download'][2] += 1
+                            self.htmlgen.writeHtmlTableCell(success=False, attackType="Malware Download",
+                                                            target=tpage, vect=f)
                             
                             
         if len(results) > 0:
@@ -1321,10 +1327,13 @@ class DVWAAttacks:
         response = fp.open(request)
         #print response.info()
         '''
-        request = urllib2.Request(targetpage, None, req_headers)
-        request.get_method = lambda : 'HEAD'
-        response = fp.open(request)
-        #print response.code
+        try:
+            request = urllib2.Request(targetpage, None, req_headers)
+            request.get_method = lambda : 'HEAD'
+            response = fp.open(request)
+            #print response.code
+        except:
+            pass
         
     def attackrequest_headers(self, fp, targetpage):
         targetpage = vars.getUrl()
