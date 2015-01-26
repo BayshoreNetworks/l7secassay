@@ -16,13 +16,17 @@ Use and/or clone at your own risk:
 The purpose of this software is to give users the ability to test the effectiveness of their WAF solution(s).
 
 ********************************************************************************************************************
-**** WARNING: if any malware makes it up to your web server via assay DO NOT forget to clean those files up!!! ****
+**** WARNING: Malware may make it up to your web server via assay ****
+
+**** !!!!! DO NOT forget to look for and clean those files up !!!!! ****
 
 **** PELIGRO: if you forget to clean those files up you may have a gaping hole in your infrastructure. ****
 
-**** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. ****
+**** ACHTUNG: best practice: put DVWA on a VM ****
 
-**** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server) ****
+**** ACHTUNG: best practice: isolate this instance of DVWA from critical resources on your network. ****
+
+**** CONSCIA: best practice: always clean up any testing Malware/Backdoor files from your test web server ****
 ********************************************************************************************************************
 
 **** It is HIGHLY recommended that you DO NOT deploy this in a production environment. ****
@@ -167,13 +171,17 @@ Steps:
 		python assay.py -s1 -a1
 
 ********************************************************************************************************************
-**** WARNING: if any malware makes it up to your web server via assay DO NOT forget to clean those files up!!! ****
+**** WARNING: Malware may make it up to your web server via assay ****
 
-**** PELIGRO: if you forget to clean these files up you may have a gaping hole in your infrastructure. ****
+**** !!!!! DO NOT forget to look for and clean those files up !!!!! ****
 
-**** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. ****
+**** PELIGRO: if you forget to clean those files up you may have a gaping hole in your infrastructure. ****
 
-**** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server) ****
+**** ACHTUNG: best practice: put DVWA on a VM ****
+
+**** ACHTUNG: best practice: isolate this instance of DVWA from critical resources on your network. ****
+
+**** CONSCIA: best practice: always clean up any testing Malware/Backdoor files from your test web server ****
 ********************************************************************************************************************
 
 
