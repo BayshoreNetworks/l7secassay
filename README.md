@@ -26,7 +26,7 @@ The purpose of this software is to give users the ability to test the effectiven
 
 **** ACHTUNG: best practice: isolate this instance of DVWA from critical resources on your network. ****
 
-**** CONSCIA: best practice: always clean up any testing Malware/Backdoor files from your test web server ****
+**** CONSCIA: best practice: always clean up any testing Malware files from your web server ****
 ********************************************************************************************************************
 
 **** It is HIGHLY recommended that you DO NOT deploy this in a production environment. ****
@@ -181,7 +181,7 @@ Steps:
 
 **** ACHTUNG: best practice: isolate this instance of DVWA from critical resources on your network. ****
 
-**** CONSCIA: best practice: always clean up any testing Malware/Backdoor files from your test web server ****
+**** CONSCIA: best practice: always clean up any testing Malware files from your web server ****
 ********************************************************************************************************************
 
 
