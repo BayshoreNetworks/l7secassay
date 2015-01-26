@@ -15,15 +15,19 @@ Use and/or clone at your own risk:
 
 The purpose of this software is to give users the ability to test the effectiveness of their WAF solution(s).
 
-*****************************************************************************************************************************
-****** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! ******
+********************************************************************************************************************
+**** WARNING: if any malware makes it up to your web server via assay DO NOT forget to clean those files up!!! ****
 
-****** PELIGRO: if you forget to clean these files up you may have a gaping hole in your infrastructure. ******
+**** PELIGRO: if you forget to clean those files up you may have a gaping hole in your infrastructure. ****
 
-****** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. ******
+**** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. ****
 
-****** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server) ******
-*****************************************************************************************************************************
+**** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server) ****
+********************************************************************************************************************
+
+**** It is HIGHLY recommended that you DO NOT deploy this in a production environment. ****
+
+**** It is HIGHLY recommended that you use an isolated part of your network for this type of testing. ****
 
 Use Case/Scenario:
 
@@ -162,15 +166,15 @@ Steps:
 	
 		python assay.py -s1 -a1
 
-*****************************************************************************************************************************
-****** WARNING: if any of the malware makes it up into your web server via assay DO NOT forget to clean those files up!!! ******
+********************************************************************************************************************
+**** WARNING: if any malware makes it up to your web server via assay DO NOT forget to clean those files up!!! ****
 
-****** PELIGRO: if you forget to clean these files up you may have a gaping hole in your infrastructure. ******
+**** PELIGRO: if you forget to clean these files up you may have a gaping hole in your infrastructure. ****
 
-****** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. ******
+**** ACHTUNG: best practice is to put DVWA on a VM and isolate it from critical resources on your network. ****
 
-****** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server) ******
-*****************************************************************************************************************************
+**** CONSCIA: but you should clean up the malware/backdoor files either way (if they get to the web server) ****
+********************************************************************************************************************
 
 
 
