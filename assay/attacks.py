@@ -1465,7 +1465,34 @@ class DVWAAttacks:
             return discattacks
         else:
             return None
+        
+    def attackbackdoor_access(self, fp, targetpage):
+        backdoorpath, backdoors = vars.getBackdoorData()
+        targetpage = vars.getUrl() + backdoorpath
+        results = []
+        
+        for f in backdoors:
+            dfile = ""
+            tpage = targetpage + f
+            tstr = backdoors[f][1]
 
+            fp.open(tpage)
+            vars.typecount['backdoor_access'][0] += 1
+            
+            if tstr in str(fp.response().read()):
+                results.append("Backdoor access achieved via '%s'" % tpage)
+                vars.typecount['backdoor_access'][1] += 1
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="Backdoor Access",
+                                                target=tpage, vect=f)
+            else:
+                vars.typecount['backdoor_access'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="Backdoor Access",
+                                                target=tpage, vect=f)
+     
+        if len(results) > 0:
+            return results
+        else:
+            return None
  
 
     """
