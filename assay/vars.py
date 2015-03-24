@@ -54,6 +54,8 @@ malwarepath = "malware%s" % slash
 staticpath = "static%s" % slash
 htmlpath = "html%s" % slash
 hackableuploadpath = "hackable%suploads%s" % (slash, slash)
+stored_exploitpath = "stored_exploits%s" % slash
+backdoors_path = "%sbackdoor%s" % (stored_exploitpath, slash)
 htmlfilename = "waf_"
 htmlfileext = ".html"
 successfulVectors = 0
@@ -74,8 +76,9 @@ typedesc = {
             'upload':["File Upload (Ingress) Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
             #'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
-            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 8],
-            'request_headers':["HTTP Request Header Attack", " vectors", "OWASP ???", 1],
+            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 7],
+            'request_headers':["HTTP Request Header Attack", " vectors", "", 8],
+            'backdoor_access':["HTTP BackDoor Access", "", "", 9],
             }
 
 """
@@ -97,13 +100,18 @@ typecount = {
             'download':[0,0,0],
             #'exposesession':[0,0,0]
             'recon':[0,0,0],
-            'request_headers':[0,0,0]
+            'request_headers':[0,0,0],
+            'backdoor_access':[0,0,0]
             }
 
 download_file_sigs = {'c99.bin':'74f1048753ed36a1de4f0d8b28dd78f5',
                       'ce014b08ae5d68a3eafd95807285e2cd':'ce014b08ae5d68a3eafd95807285e2cd',
                       'y3ym.exe':'5c0b7198187a971112a3e504c3ab9369'
                       }
+
+backdoors_file_sigs = {'c99.php':['74f1048753ed36a1de4f0d8b28dd78f5','PHP Shell . Net'],
+                       'r57.php':['7eae6bcb978d5cdecc34e146b22526aa','r57shell']
+                       }
 
 def getMalwarePath():
     return malwarepath
@@ -144,4 +152,7 @@ def getExtUrl():
 
 def getHackableUploadPath():
     return hackableuploadpath
+
+def getBackdoorData():
+    return (backdoors_path,backdoors_file_sigs)
     
