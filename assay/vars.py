@@ -29,6 +29,11 @@ targetport = 80
 user = "admin"
 userpass = "password"
 dvwa_server_path = "/web/server/dvwa/hackable/uploads/"
+'''
+    HTTP status codes sent back by WAF when it
+    blocks or performs a deny operation
+'''
+waf_response_codes = [500]
 
 '''
     external host info - optional
