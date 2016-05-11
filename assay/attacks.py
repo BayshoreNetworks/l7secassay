@@ -551,8 +551,8 @@ class DVWAAttacks:
         pvect = ""
 
         ##Loop through the list of sql injection files
-        for file in os.listdir(vars.getStaticPath() + 'sql-injection/'):
-            with open(vars.getStaticPath() + 'sql-injection/' + file) as vectorz:
+        for file in os.listdir(vars.getStaticPath() + vars.getSqlInjectionPath() ):
+            with open(vars.getStaticPath() + vars.getSqlInjectionPath() + file) as vectorz:
                 # iterate thru vectors
                 for p in vectorz:
                     # split vector up based on delimiter :::
@@ -1172,29 +1172,31 @@ class DVWAAttacks:
         discattacks = []
         pvect = ""
 
-        with open(vars.getStaticPath() + 'xss.txt') as vectorz:
-            # iterate thru vectors
-            for p in vectorz:
-                # split vector up based on delimiter :::
-                p = p.split(":::")[0]
-                pvect = self.sanitizeVector(vect=p, xss=True)
+        ##Loop through the list of xss files
+        for file in os.listdir( vars.getStaticPath() + vars.getXssPath() ):
+            with open(vars.getStaticPath() + vars.getXssPath() + file) as vectorz:
+                # iterate thru vectors
+                for p in vectorz:
+                    # split vector up based on delimiter :::
+                    p = p.split(":::")[0]
+                    pvect = self.sanitizeVector(vect=p, xss=True)
 
-                tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
-                vars.typecount['xss_r'][0] += 1
-                if p in tstr:
-                    '''
-                    print p
-                    print tstr
-                    '''
-                    discattacks.append(p)
-                    #print "\n\n**********XSS: %s\n\n" % p
-                    vars.typecount['xss_r'][1] += 1
-                    self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
-                                            target=targetpage, vect=pvect)
-                else:
-                    vars.typecount['xss_r'][2] += 1
-                    self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
-                                            target=targetpage, vect=pvect)
+                    tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
+                    vars.typecount['xss_r'][0] += 1
+                    if p in tstr:
+                        '''
+                        print p
+                        print tstr
+                        '''
+                        discattacks.append(p)
+                        #print "\n\n**********XSS: %s\n\n" % p
+                        vars.typecount['xss_r'][1] += 1
+                        self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
+                                                target=targetpage, vect=pvect)
+                    else:
+                        vars.typecount['xss_r'][2] += 1
+                        self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
+                                                target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
             return discattacks
@@ -1214,25 +1216,27 @@ class DVWAAttacks:
         discattacks = []
         pvect = ""
 
-        with open(vars.getStaticPath() + 'xss.txt') as vectorz:
-            # iterate thru vectors
-            for p in vectorz:
-                # split vector up based on delimiter :::
-                p = p.split(":::")[0]
-                pvect = self.sanitizeVector(vect=p, xss=True)
+        ##Loop through the list of xss files
+        for file in os.listdir(vars.getStaticPath() + vars.getXssPath()):
+            with open(vars.getStaticPath() + vars.getXssPath() + file) as vectorz:
+                # iterate thru vectors
+                for p in vectorz:
+                    # split vector up based on delimiter :::
+                    p = p.split(":::")[0]
+                    pvect = self.sanitizeVector(vect=p, xss=True)
 
-                tstr = funcs.formSubmit(fp, targetpage, 0, {"txtName":"test User", "mtxMessage":p}, sleep=False)
-                vars.typecount['xss_s'][0] += 1
-                if p in tstr:
-                    discattacks.append(p)
-                    #print "\n\n**********XSS: %s\n\n" % p
-                    vars.typecount['xss_s'][1] += 1
-                    self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
-                                            target=targetpage, vect=pvect)
-                else:
-                    vars.typecount['xss_s'][2] += 1
-                    self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
-                                            target=targetpage, vect=pvect)
+                    tstr = funcs.formSubmit(fp, targetpage, 0, {"txtName":"test User", "mtxMessage":p}, sleep=False)
+                    vars.typecount['xss_s'][0] += 1
+                    if p in tstr:
+                        discattacks.append(p)
+                        #print "\n\n**********XSS: %s\n\n" % p
+                        vars.typecount['xss_s'][1] += 1
+                        self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
+                                                target=targetpage, vect=pvect)
+                    else:
+                        vars.typecount['xss_s'][2] += 1
+                        self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
+                                                target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
             return discattacks
