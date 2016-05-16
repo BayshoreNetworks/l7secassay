@@ -594,6 +594,12 @@ def normalizeVectorList(dir_path):
         with open(dir_path + file) as vectorz:
             for p in vectorz:
                 if p not in vectorList:
-                    vectorList.append(p)
+                    #vectorList.append(p)
+                    try:
+                        #p.encode('utf-8')
+                        vectorList.append(p.encode('utf-8'))
+                    except:
+                        pass
+
 
     return vectorList

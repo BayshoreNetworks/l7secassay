@@ -1,7 +1,7 @@
 """
     Generator class to build the HTML content for storage
     in the output file
-    
+
     License:
     assay
     Copyright (C) 2010 - 2013 Bayshore Networks, Inc.
@@ -36,10 +36,10 @@ class HTMLGenerator():
     HTML_HEAD_CLOSE = "</head>"
     HTML_TITLE_OPEN = "<title>"
     HTML_TITLE_CLOSE = "</title>"
-    
+
     def __init__(self, targeturl=""):
         self.targeturl = targeturl
-        
+
         self.text1 = "Scan Results for "
         self.html = ""
         self.html += self.HTML_OPEN
@@ -53,7 +53,7 @@ class HTMLGenerator():
         self.html += "<p>%s%s</p>" % (self.text1, targeturl)
         self.t = HTML.Table(header_row=['Status', 'Category', 'Attack Vector', 'Target'],
                             attribs={'class':'formtable'})
-        
+
     def writeHtmlTableCell(self, success=False, attackType="", target="", vect=""):
         if success:
             _category = HTML.TableCell("<div style=\"white-space:normal;\">" + attackType + "</div>",
@@ -67,9 +67,9 @@ class HTMLGenerator():
             _target = HTML.TableCell(target, attribs={'class':'cell_attack_failed'})
             _status = HTML.TableCell("Failed", attribs={'class':'cell_attack_failed'})
             _vector = HTML.TableCell("<div style=\"word-break:break-all;\">" + vect + "</div>", attribs={'class':'cell_attack_failed'})
-            
+
         self.t.rows.append([_status, _category, _vector, _target])
-        
+
     def generateHtmlStats(self, keyval={}):
         sts = "<p>Stats</p>"
         t = HTML.Table(header_row=['Type', 'Sent', 'Successful', 'Failed'],
@@ -83,7 +83,7 @@ class HTMLGenerator():
                 if value[1] < 1:
                     _category = HTML.TableCell(atype,
                                                attribs={"style":"word-break:break-all",
-                                                        'class':'cell_attack_failed'})                      
+                                                        'class':'cell_attack_failed'})
                     _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_failed'})
                     _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_failed'})
                     _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_failed'})
@@ -94,27 +94,27 @@ class HTMLGenerator():
                     _sent = HTML.TableCell(value[0], attribs={'class':'cell_attack_success'})
                     _success = HTML.TableCell(value[1], attribs={'class':'cell_attack_success'})
                     _fail = HTML.TableCell(value[2], attribs={'class':'cell_attack_success'})
-                
+
                 t.rows.append([_category, _sent, _success, _fail])
         return sts + str(t)
-    
+
     def genGraphs(self, keyval={}):
         thestr = ""
         cnt = 0
         for key, value in sorted(keyval.iteritems(), key=lambda (k,v): (v,k)):
             graph = graphs.BarGraph('hBar')
             sarr = []
-            
+
             try:
                 atype = vars.typedesc[key][0]
             except KeyError:
                 atype = key.title()
-            
+
             thestr += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\"><tr><td><p>%s - Sent: %s</p></td></tr><tr><td>" % (atype, value[0])
             sarr.append(atype)
             #thestr += "var s%s = [%s, %s, %s];" % (cnt, value[0], value[1], value[2])
             graph.values.append((value[1], value[2]))
-        
+
             graph.labels = sarr
             if cnt == 0:
                 graph.legend = ['Succeeded', 'Failed']
@@ -123,14 +123,14 @@ class HTMLGenerator():
             thestr += "</td></tr></table>"
             cnt += 1
         return thestr
-    
+
     def saveHTML(self, fhandle="", keyval={}):
         fhandle = fhandle
         f = open(fhandle, 'w')
-        
+
         self.html += str(self.t)
         self.html += self.generateHtmlStats(keyval=keyval)
-        
+
         if genGraphs():
             self.html += "<div><pre>"
             self.html += self.genGraphs(keyval=keyval)
@@ -138,10 +138,9 @@ class HTMLGenerator():
         self.html += "<br />"
         self.html += self.HTML_BODY_CLOSE
         self.html += self.HTML_CLOSE
-        
+
         # make it purty :-)
         soup = bs(self.html.encode('utf-8'), indentWidth='    ')
         prettyHTML = soup.prettify()
         f.write(prettyHTML)
         f.close()
-          

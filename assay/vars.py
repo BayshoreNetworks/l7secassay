@@ -1,6 +1,6 @@
 """
     Just a bunch of variables used by assay
-    
+
     License:
     assay
     Copyright (C) 2010 - 2015 Bayshore Networks, Inc.
@@ -61,6 +61,8 @@ htmlpath = "html%s" % slash
 hackableuploadpath = "hackable%suploads%s" % (slash, slash)
 stored_exploitpath = "stored_exploits%s" % slash
 backdoors_path = "%sbackdoor%s" % (stored_exploitpath, slash)
+sqlinjection_path = "sql-injection%s" % slash
+xss_path = "xss%s" % slash
 htmlfilename = "waf_"
 htmlfileext = ".html"
 successfulVectors = 0
@@ -71,7 +73,7 @@ redirtoken = base64.b64encode(exturl + extpath + extresource)
 typedesc = {
             #'brute':["Brute-Force Attack", " vectors", "OWASP Top 10 - A3: Broken Authentication and Session Management", 0],
             #'redir':["Unvalidated Redirect Attack", "", "A10: Unvalidated Redirects and Forwards", 2],
-            
+
             'exec':["Command Execution Attack", " vectors", "OWASP Top 10 - A1: Injection", 0],
             'fi':["File Inclusion Attack", " vectors", "OWASP Top 10 - A4: Insecure Direct Object References", 1],
             'xss_r':["Cross-Site Scripting (XSS) Reflective Attack", " vectors", "OWASP Top 10 - A2: Cross-Site Scripting (XSS)", 2],
@@ -88,7 +90,7 @@ typedesc = {
 
 """
     the value structure here is:
-    
+
     [attackCount, attackSucceeded, attackFailed]
 """
 typecount = {
@@ -136,7 +138,7 @@ def getApppath():
 
 def getHtmlPath():
     return htmlpath
-    
+
 def getHtmlFileName():
     return htmlfilename
 
@@ -160,4 +162,9 @@ def getHackableUploadPath():
 
 def getBackdoorData():
     return (backdoors_path,backdoors_file_sigs)
-    
+
+def getSqlInjectionPath():
+    return sqlinjection_path
+
+def getXssPath():
+    return xss_path
