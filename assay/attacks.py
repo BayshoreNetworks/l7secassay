@@ -584,6 +584,55 @@ class DVWAAttacks:
     # EOF
 
     """
+        anti_sqli
+    """
+    def anti_sqli():
+        sqlisuccessstr = "First"
+        # compile regex for success based on the dvwa page
+        # displaying the attack vector, this means the
+        # injection was successful
+        regSQLi = re.compile(sqlisuccessstr,re.I+re.MULTILINE)
+        # error regex for false positives when MySQL throws
+        # a syntax error
+        regErr = re.compile("error",re.I+re.MULTILINE)
+        discattacks = []
+        pvect = ""
+
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList(vars.getStaticPath() + vars.getAntiSqliPath() )
+
+        # iterate thru vectors
+        for p in vectorz:
+            pvect = self.sanitizeVector(vect=p)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"id":p}, sleep=False)
+            vars.typecount['anti_sqli'][0] += 1
+            if not regErr.search(tstr):
+                print tstr
+                if regSQLi.search(tstr):
+                    discattacks.append(p)
+                    #print "\n\n**********SQLi: %s\n\n" % p
+                    vars.typecount['anti_sqli'][1] += 1
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="SQLi",
+                                            target=targetpage, vect=pvect)
+                else:
+                    vars.typecount['anti_sqli'][2] += 1
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
+                                            target=targetpage, vect=pvect)
+            else:
+                vars.typecount['anti_sqli'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
+                                        target=targetpage, vect=pvect)
+
+        if len(discattacks) > 0:
+            return discattacks
+        else:
+            return None
+    # EOF
+
+
+
+    """
         attacksqli_blind covers areas of:
         OWASP Top 10 - A1: Injection
 
