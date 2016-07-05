@@ -584,9 +584,12 @@ class DVWAAttacks:
     # EOF
 
     """
-        anti_sqli
+        anti_sqli:
+
+        Puts in vectors that may look like a sql-injection attack but should not
+        trigger a block by the security device.
     """
-    def anti_sqli():
+    def attackanti_sqli(self, fp, targetpage):
         sqlisuccessstr = "First"
         # compile regex for success based on the dvwa page
         # displaying the attack vector, this means the
@@ -1285,6 +1288,55 @@ class DVWAAttacks:
             else:
                 vars.typecount['xss_s'][2] += 1
                 self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
+                                        target=targetpage, vect=pvect)
+
+        if len(discattacks) > 0:
+            return discattacks
+        else:
+            return None
+    # EOF
+
+    """
+        attackanti_xss:
+
+        Puts in vectors that may look like xss attack but should not
+        trigger a block by the security device.
+    """
+    def attackanti_xss(self, fp, targetpage):
+        """
+            construct regex to detect a successful injection.
+            cmdsuccessstr is present after a POST that was
+            not successful as an attack, if there is data
+            between those tags that means the attack vector
+            was successful
+        """
+        discattacks = []
+        pvect = ""
+
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList( vars.getStaticPath() + vars.getAntiXSSPath() )
+
+        # iterate thru vectors
+        for p in vectorz:
+            # split vector up based on delimiter :::
+            p = p.split(":::")[0]
+            pvect = self.sanitizeVector(vect=p, xss=True)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
+            vars.typecount['anti_xss'][0] += 1
+            if p in tstr:
+                '''
+                print p
+                print tstr
+                '''
+                discattacks.append(p)
+                #print "\n\n**********XSS: %s\n\n" % p
+                vars.typecount['anti_xss'][1] += 1
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="Anti_XSS",
+                                        target=targetpage, vect=pvect)
+            else:
+                vars.typecount['anti_xss'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="Anti_XSS",
                                         target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
