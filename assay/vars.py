@@ -63,6 +63,8 @@ stored_exploitpath = "stored_exploits%s" % slash
 backdoors_path = "%sbackdoor%s" % (stored_exploitpath, slash)
 sqlinjection_path = "sql-injection%s" % slash
 xss_path = "xss%s" % slash
+anti_sqli = "anti_sqli%s" % slash
+anti_xss = "anti_xss%s" % slash
 htmlfilename = "waf_"
 htmlfileext = ".html"
 successfulVectors = 0
@@ -79,13 +81,15 @@ typedesc = {
             'xss_r':["Cross-Site Scripting (XSS) Reflective Attack", " vectors", "OWASP Top 10 - A2: Cross-Site Scripting (XSS)", 2],
             'xss_s':["Cross-Site Scripting (XSS) Stored Attack", " vectors", "OWASP Top 10 - A2: Cross-Site Scripting (XSS)", 3],
             'sqli':["SQL Injection Attack", " vectors", "OWASP Top 10 - A1: Injection", 4],
-            'sqli_blind':["Blind SQL Injection Attack", "", "OWASP Top 10 - A1: Injection", 5],
-            'upload':["File Upload (Ingress) Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 6],
+            'anti_sqli':["SQL Injection Anti-Attack", " vectors", "Vectors that should not be blocked by SQL-injection protection", 5],
+            'sqli_blind':["Blind SQL Injection Attack", "", "OWASP Top 10 - A1: Injection", 6],
+            'anti_xss':["Cross-Site Scripting (XSS) Anti-Attack", " vectors", "Vectors that should not be blocked by XSS protection", 7],
+            'upload':["File Upload (Ingress) Attacks", "", ["OWASP Top 10 - A1: Injection","OWASP Top 10 - A8: Failure to Restrict URL Access"], 8],
             #'exposesession':["Information Leakage of Session ID", " data", "OWASP Top 10 - A3: Broken Authentication and Session Management", 7],
             #'csrf':["Cross-Site Request Forgery", " Attack", "OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)", 10],
-            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 7],
-            'request_headers':["HTTP Request Header Attack", " vectors", "", 8],
-            'backdoor_access':["HTTP BackDoor Access", "", "", 9],
+            'download':["File Download (Egress) Attacks", "", "Spreading File-based Malware via Egress", 9],
+            'request_headers':["HTTP Request Header Attack", " vectors", "", 10],
+            'backdoor_access':["HTTP BackDoor Access", "", "", 11],
             }
 
 """
@@ -102,7 +106,9 @@ typecount = {
             'xss_r':[0,0,0],
             'xss_s':[0,0,0],
             'sqli':[0,0,0],
+            'anti_sqli':[0,0,0],
             'sqli_blind':[0,0,0],
+            'anti_xss':[0,0,0],
             'upload':[0,0,0],
             'download':[0,0,0],
             #'exposesession':[0,0,0]
@@ -168,3 +174,9 @@ def getSqlInjectionPath():
 
 def getXssPath():
     return xss_path
+
+def getAntiSqliPath():
+    return anti_sqli
+
+def getAntiXSSPath():
+    return anti_xss
