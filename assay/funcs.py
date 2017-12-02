@@ -1,6 +1,6 @@
 """
     Just a bunch of useful and often used functions for assay
-    
+
     License:
     assay
     Copyright (C) 2010 - 2015 Bayshore Networks, Inc.
@@ -265,7 +265,7 @@ def getRandUserAgent():
                "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)",
                "Windows-RSS-Platform/1.0 (MSIE 7.0; Windows NT 5.1)",
                "Windows NT 6.0 (MSIE 7.0)",
-               "Windows NT 4.0 (MSIE 5.0)",             
+               "Windows NT 4.0 (MSIE 5.0)",
                "Opera/6.x (Windows NT 4.0; U) [de]",
                "Opera/7.x (Windows NT 5.1; U) [en]",
                'Opera/8.0 (X11; Linux i686; U; cs)',
@@ -312,7 +312,7 @@ def doFormDiscovery(fp, target):
                 detectedforms.append(ff)
     except(socket.gaierror, urllib2.HTTPError, urllib2.URLError), msg:
         attackOutPut(stepFour, "info", msg)
-        
+
 
     if len(detectedforms) == 1:
         attackOutPut(stepFour, "discovered", "One form detected, using it ...")
@@ -440,14 +440,14 @@ def attackOutPut(n, status, s):
 """
 def isBlock(resp):
     #print "Resp: %s" % resp
-    blockDetect = ['Not Acceptable', 
-                   '406', 
-                   'Method Not Implemented', 
-                   '501', 
+    blockDetect = ['Not Acceptable',
+                   '406',
+                   'Method Not Implemented',
+                   '501',
                    'Error',
-                   '500', 
-                   'Internal Server Error', 
-                   '400', 
+                   '500',
+                   'Internal Server Error',
+                   '400',
                    'Bad Request']
 
     """
@@ -478,7 +478,7 @@ def printStats():
                 atype = key.title()
             attackOutPut(stepThree, "info", "%s: Sent: %s, Successful: %s, Failed: %s" % (atype, value[0], value[1], value[2]))
             succCnt += value[1]
-            
+
     #funcs.attackOutPut(funcs.stepTwo, "info", "%d injected vectors are suspected to be successful" % vars.successfulVectors)
     vect = "vectors are"
     if succCnt < 1:
@@ -486,7 +486,7 @@ def printStats():
     attackOutPut(stepTwo, "info", "%d injected %s suspected successful" % (succCnt,vect))
     vect = "vectors"
     if vars.blockedVectors < 1:
-        vect = "vector was"    
+        vect = "vector was"
     attackOutPut(stepTwo, "info", "%d injected %s suspected to have been blocked" % (vars.blockedVectors,vect))
     print
 # EOF
@@ -551,21 +551,21 @@ def killPid(ppid=0):
         os.kill(int(ppid), signal.SIGTERM)
     except OSError:
         pass
-    
+
 def getServerMalwareList(fp, targetpage):
     attackOutPut(stepThree, "step", "Attempting to read list of files that can be downloaded from %s" % targetpage)
-    
+
     type_ignores = ['ICO', 'DIR']
     targfiles = []
     fp.open(targetpage)
     retstr = fp.response().read()
-    
+
     #for i in re.findall('href="(.+?)"', retstr):
     for i in re.findall('alt="\[(.+?)\]".+?href="(.+?)"', retstr):
         if i[0] not in type_ignores:
             attackOutPut(stepFour, "discovered", "File: \"%s\" is visible" % i[1])
             targfiles.append(i[1])
-        
+
     return targfiles
 
 def clean_up_tor():
@@ -577,7 +577,7 @@ def clean_up_tor():
         # close opened file
         fo.close()
         killPid(ppid=tpid)
-        
+
 def is_target_up(fp=''):
     resp = None
     request = urllib2.Request(vars.getUrl())
@@ -588,5 +588,18 @@ def is_target_up(fp=''):
     else:
         return False
 
-    
+def normalizeVectorList(dir_path):
+    vectorList = []
+    for file in os.listdir( dir_path ):
+        with open(dir_path + file) as vectorz:
+            for p in vectorz:
+                if p not in vectorList:
+                    #vectorList.append(p)
+                    try:
+                        #p.encode('utf-8')
+                        vectorList.append(p.encode('utf-8'))
+                    except:
+                        pass
 
+
+    return vectorList

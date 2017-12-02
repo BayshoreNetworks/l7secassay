@@ -1,0 +1,16 @@
+Original code by Andres Andreu <andres dot andreu [at] bayshorenetworks dot com>
+
+Current contributors/authors from the Bayshore Networks side:
+
+- Andres Andreu <andres dot andreu [at] bayshorenetworks dot com>
+- Beau Taub <beau dot taub [at] bayshorenetworks dot com>
+- Chris Elias <celias [at] bayshorenetworks dot com>
+
+Credit for external libraries and such go out to:
+
+- Sandro Gauci && Wendel G. Henrique for wafw00f <https://github.com/sandrogauci/wafw00f>
+- Adam Muntner for the fuzzed project <https://github.com/fuzzdb-project/fuzzdb>
+
+
+If you did contribute or we somehow overlooked giving you credit please do
+let us know: <support [at] bayshorenetworks dot com>

